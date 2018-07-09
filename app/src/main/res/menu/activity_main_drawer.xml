@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_wallet"
+            android:icon="@mipmap/my_cards"
+            android:title="Wallet" />
+        <item
+            android:id="@+id/nav_my_cards"
+            android:icon="@mipmap/my_cards"
+            android:title="My Cards" />
+        <item
+            android:id="@+id/nav_add_card"
+            android:icon="@mipmap/add_card"
+            android:title="Add Card" />
+        <item
+            android:id="@+id/nav_pay"
+            android:icon="@mipmap/pay_icon"
+            android:title="Pay" />
+        <item
+            android:id="@+id/nav_map"
+            android:icon="@mipmap/map_icon"
+            android:title="Map" />
+        <item
+            android:id="@+id/nav_history"
+            android:icon="@mipmap/history_icon"
+            android:title="History" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@mipmap/logout_icon"
+            android:title="Logout" />
+
+    </group>
+
+</menu>

@@ -1,0 +1,56 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.android.nfc.smartpay_v3">
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-feature android:name="android.hardware.nfc" android:required="true"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" android:requiredFeature="false" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="true" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <meta-data
+            android:name="android.nfc.disable_beam_default"
+            android:value="true" />
+
+    <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="AIzaSyCp8Dxigtc6aA-sJHKnmUBedLyNNFQiJLA" />
+
+    <activity android:name=".Activities.LoginActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
+        <activity android:name=".Activities.PurchaserMainActivity">
+
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="vnd.android.nfc"
+                    android:host="ext"
+                    android:pathPrefix="/nfclab.com:SmartPay" />
+            </intent-filter>
+        </activity>
+    <activity
+        android:name=".Activities.MainActivity"
+        android:label="@string/title_activity_main"
+        android:theme="@style/AppTheme.NoActionBar" />
+    <activity android:name=".Activities.PayActivity" />
+    <activity android:name=".Activities.RegisterActivity"></activity>
+    </application>
+</manifest>

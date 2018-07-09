@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/et_money_to_deduct"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/edit_text_cont"
+        android:ems="10"
+        android:hint="Money to Deduct From Card - Balance 1000"
+        android:inputType="number"
+        android:padding="15dp" />
+
+    <Button
+        android:id="@+id/deductBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="33dp"
+        android:layout_gravity="right"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/login_button_cont"
+        android:text="Deduct" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:layout_marginTop="10dp"
+        android:text="Payment History"
+        android:textColor="@android:color/black" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/card_payment_history_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="5dp"
+        android:padding="5dp" />
+
+</LinearLayout>

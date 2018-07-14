@@ -9,12 +9,9 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.nfc.smartpay_v3.Classes.Companey;
 import com.android.nfc.smartpay_v3.Classes.PaymentInfo;
 import com.android.nfc.smartpay_v3.DBA.Configuration;
-import com.android.nfc.smartpay_v3.DBA.DBA;
 import com.android.nfc.smartpay_v3.DBA.MySingleton;
-import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,10 +57,10 @@ public class PaymentHistoryInfoManager {
                             try {
                                 JSONObject jsonObject = response.getJSONObject(count);
                                 PaymentInfo paymentInfo = new PaymentInfo();
-                                paymentInfo.setBillAmount(jsonObject.getDouble(Configuration.KEY_PAYMENT_BILL_AMOUNT));
-                                paymentInfo.setCompaneyName(jsonObject.getString(Configuration.KEY_PAYMENT_COMPANY_NAME));
-                                paymentInfo.setCompaneyType(jsonObject.getInt(Configuration.KEY_PAYMENT_COMPANY_TYPE));
-                                paymentInfo.setStringDate(jsonObject.getString(Configuration.KEY_PAYMENT_DATE));
+                                paymentInfo.setBillAmount(jsonObject.getString(Configuration.KEY_PAYMENT_BILL_AMOUNT));
+                                paymentInfo.setCompanyName(jsonObject.getString(Configuration.KEY_PAYMENT_COMPANY_NAME));
+                                paymentInfo.setCompanyType(jsonObject.getInt(Configuration.KEY_PAYMENT_COMPANY_TYPE));
+                                paymentInfo.setDate(jsonObject.getString(Configuration.KEY_PAYMENT_DATE));
                                 paymentInfo.setStringTime(jsonObject.getString(Configuration.KEY_PAYMENT_TIME));
                                 paymentInfosList.add(paymentInfo);
                             } catch (JSONException e) {

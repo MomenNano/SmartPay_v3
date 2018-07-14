@@ -7,27 +7,28 @@ import java.util.Date;
  */
 
 public class PaymentInfo {
-    String companeyName ;
-    int CompaneyType ;
+    String purchaserName;
+    String companyName;
+    int CompanyType;
     Date paymentDate ;
-    String stringDate;
+    String date;
     String stringTime;
-    double billAmount;
+    String billAmount;
 
-    public String getCompaneyName() {
-        return companeyName;
+    public String getCompanyName() {
+        return companyName;
     }
 
-    public void setCompaneyName(String companeyName) {
-        this.companeyName = companeyName;
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
-    public int getCompaneyType() {
-        return CompaneyType;
+    public int getCompanyType() {
+        return CompanyType;
     }
 
-    public void setCompaneyType(int companeyType) {
-        CompaneyType = companeyType;
+    public void setCompanyType(int companyType) {
+        CompanyType = companyType;
     }
 
     public Date getPaymentDate() {
@@ -39,21 +40,21 @@ public class PaymentInfo {
     }
 
 
-    public double getBillAmount() {
+    public String getBillAmount() {
         return billAmount;
     }
 
-    public void setBillAmount(double billAmount) {
+    public void setBillAmount(String billAmount) {
         this.billAmount = billAmount;
     }
 
-    public String getStringDate() {
+    public String getDate() {
 
-        return stringDate;
+        return date;
     }
 
-    public void setStringDate(String stringDate) {
-        this.stringDate = stringDate;
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public String getStringTime() {

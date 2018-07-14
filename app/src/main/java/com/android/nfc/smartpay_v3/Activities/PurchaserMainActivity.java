@@ -1,10 +1,6 @@
 package com.android.nfc.smartpay_v3.Activities;
 
 import android.annotation.TargetApi;
-import android.app.KeyguardManager;
-import android.content.Context;
-import android.hardware.fingerprint.FingerprintManager;
-import android.nfc.NfcEvent;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
@@ -17,7 +13,11 @@ import android.os.Parcelable;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.nfc.smartpay_v3.Classes.PaymentInfo;
 import com.android.nfc.smartpay_v3.R;
+import com.google.gson.Gson;
+
+import java.util.Date;
 //import java.nio.charset.Charset;
 
 /*
@@ -31,6 +31,7 @@ public class PurchaserMainActivity extends AppCompatActivity {
     private NdefMessage ndefMessage;
     boolean allGood = false;
     protected String externalType = "nfclab.com:SmartPay";
+    PaymentInfo paymentInfo = new PaymentInfo();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,16 +57,18 @@ public class PurchaserMainActivity extends AppCompatActivity {
         if(Build.VERSION.SDK_INT >= 21){
             //this.invokeBeam();
         }
+        //this.invokeBeam();
         /*if(allGood){
 
-            }*/
-        ndefMessage = createNdefMessage();
+ndefMessage = createNdefMessage();
         nfcAdapter.setNdefPushMessage(ndefMessage,this);
+            }*/
+
 
         //nfcAdapter.setOnNdefPushCompleteCallback(null,this);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+   /* @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     protected void invokeBeam(){
         nfcAdapter.invokeBeam(this);
     }
@@ -83,8 +86,14 @@ public class PurchaserMainActivity extends AppCompatActivity {
 
     private NdefMessage createNdefMessage() {
         String done = "Done";
-        NdefRecord textRecord = new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE,externalType.getBytes(), new byte[0], done.getBytes());
-        NdefMessage message= new NdefMessage(new NdefRecord[] {textRecord,NdefRecord.createApplicationRecord("com.android.nfc.purchasersmartpay")});
+
+
+        Gson gson = new Gson();
+
+        String msg = gson.toJson(paymentInfo);
+        NdefRecord textRecord = new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE,externalType.getBytes(), new byte[0], msg.getBytes());
+        //NdefMessage message= new NdefMessage(new NdefRecord[] {textRecord,NdefRecord.createApplicationRecord("com.android.nfc.purchasersmartpay")});
+        NdefMessage message= new NdefMessage(textRecord);
         return message;
     }
 
@@ -103,10 +112,10 @@ public class PurchaserMainActivity extends AppCompatActivity {
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
             receiveIntent(getIntent());      }
 
-        if(allGood){
+        /*if(allGood){
             ndefMessage = createNdefMessage();
             nfcAdapter.setNdefPushMessage(ndefMessage,this);
-        }
+        }*/
     }
 
     private void receiveIntent(Intent intent) {
@@ -117,7 +126,20 @@ public class PurchaserMainActivity extends AppCompatActivity {
         //String payload = new String (record.getPayload(),0,record.getPayload().length, Charset.forName("UTF-8"));
         String payload = new String (record.getPayload());
         allGood = true;
+        Gson gson = new Gson();
+        paymentInfo = gson.fromJson(payload,PaymentInfo.class);
+
+        paymentInfo.setBillAmount(paymentInfo.getBillAmount());
+        paymentInfo.setCompanyName("lol");
+        paymentInfo.setCompanyType(123);
+        paymentInfo.setPaymentDate(new Date());
         PurchaserMessage.setText(payload);
+
+        if(allGood){
+
+            ndefMessage = createNdefMessage();
+            nfcAdapter.setNdefPushMessage(ndefMessage,this);
+        }
 
     }
 

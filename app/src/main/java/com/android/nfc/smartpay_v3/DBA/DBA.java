@@ -1,27 +1,13 @@
 package com.android.nfc.smartpay_v3.DBA;
 
-import android.content.Context;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.nfc.smartpay_v3.Classes.Account;
 import com.android.nfc.smartpay_v3.Classes.Companey;
 import com.android.nfc.smartpay_v3.Classes.Card;
 import com.android.nfc.smartpay_v3.Classes.PaymentInfo;
 import com.android.nfc.smartpay_v3.R;
-import com.google.android.gms.appdatasearch.GetRecentContextCall;
 import com.google.android.gms.maps.model.LatLng;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Fifty on 6/6/2018.
@@ -66,9 +52,9 @@ public class DBA {
         for(int i=0 ; i<5 ;i++){
             Date today = new Date();
             PaymentInfo paymentInfo = new PaymentInfo();
-            paymentInfo.setCompaneyName("Riyadh Cafe");
-            paymentInfo.setBillAmount(250);
-            paymentInfo.setCompaneyType(1);
+            paymentInfo.setCompanyName("Riyadh Cafe");
+            paymentInfo.setBillAmount("250");
+            paymentInfo.setCompanyType(1);
             paymentInfo.setPaymentDate(today);
             paymentInfosList.add(paymentInfo);
         }

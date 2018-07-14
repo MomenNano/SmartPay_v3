@@ -30,12 +30,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
-public class PayActivity extends Activity implements NfcAdapter.OnNdefPushCompleteCallback,
-        NfcAdapter.CreateNdefMessageCallback{
+public class PayActivity extends Activity {
     private NfcAdapter nfcAdapter;
     private ArrayList<String> messagesToSendArray = new ArrayList<>();
     private ArrayList<byte[]> messagesReceivedArray = new ArrayList<>();
-    BillInfo billInfo = new BillInfo();
+    /*BillInfo billInfo = new BillInfo();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,9 +126,9 @@ public class PayActivity extends Activity implements NfcAdapter.OnNdefPushComple
         NdefRecord record ;
         PaymentInfo paymentInfo = new PaymentInfo();
         Date today = new Date();
-        paymentInfo.setCompaneyName(billInfo.getCompaney().getName());
+        paymentInfo.setCompanyName(billInfo.getCompaney().getName());
         paymentInfo.setBillAmount(billInfo.getBillAmount());
-        paymentInfo.setCompaneyType(billInfo.getCompaney().getType());
+        paymentInfo.setCompanyType(billInfo.getCompaney().getType());
         paymentInfo.setPaymentDate(today);
         byte[] payload ;
 
@@ -220,5 +219,5 @@ public class PayActivity extends Activity implements NfcAdapter.OnNdefPushComple
 
     private void messageSendSuccessfully() {
 
-    }
+    }*/
 }

@@ -79,11 +79,11 @@ public class HistoryFragment extends Fragment {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm a");
             holder.paymentObj = paymentList.get(position);
-            holder.companeyNameTextView.setText(holder.paymentObj.getCompaneyName());
+            holder.companeyNameTextView.setText(holder.paymentObj.getCompanyName());
             holder.paymentDateTextView.setText(dateFormat.format(holder.paymentObj.getPaymentDate()));
             holder.paymentTimeTextView.setText(timeFormat.format(holder.paymentObj.getPaymentDate()));
             holder.billAmountTextView.setText(String.valueOf(holder.paymentObj.getBillAmount())+" SDG");
-            if(holder.paymentObj.getCompaneyType()==1)
+            if(holder.paymentObj.getCompanyType()==1)
                 holder.companeyIcon.setImageResource(R.mipmap.coffee_icon);
 
         }

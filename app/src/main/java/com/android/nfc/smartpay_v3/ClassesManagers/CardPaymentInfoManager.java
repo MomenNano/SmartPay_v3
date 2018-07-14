@@ -21,9 +21,9 @@ public class CardPaymentInfoManager {
         for(int i=0 ; i<5 ;i++){
             Date today = new Date();
             PaymentInfo paymentInfo = new PaymentInfo();
-            paymentInfo.setCompaneyName("Riyadh Cafe");
-            paymentInfo.setBillAmount(250);
-            paymentInfo.setCompaneyType(1);
+            paymentInfo.setCompanyName("Riyadh Cafe");
+            paymentInfo.setBillAmount("250");
+            paymentInfo.setCompanyType(1);
             paymentInfo.setPaymentDate(today);
             paymentInfosList.add(paymentInfo);
         }

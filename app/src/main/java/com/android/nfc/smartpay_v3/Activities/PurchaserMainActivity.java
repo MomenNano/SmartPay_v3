@@ -1,6 +1,5 @@
 package com.android.nfc.smartpay_v3.Activities;
 
-import android.annotation.TargetApi;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
@@ -18,15 +17,9 @@ import com.android.nfc.smartpay_v3.R;
 import com.google.gson.Gson;
 
 import java.util.Date;
-//import java.nio.charset.Charset;
-
-/*
-* check if the NdefMessage callback excute on onCreate() or on onResume
-* */
 
 public class PurchaserMainActivity extends AppCompatActivity {
     private NfcAdapter nfcAdapter;
-    private boolean isArriveSuccessfully = false;
     private TextView PurchaserMessage;
     private NdefMessage ndefMessage;
     boolean allGood = false;
@@ -40,143 +33,100 @@ public class PurchaserMainActivity extends AppCompatActivity {
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
-        if (nfcAdapter == null){
+        PurchaserMessage = (TextView) findViewById(R.id.PurchaserMessage);
+
+    }
+
+    protected void checkNFCSupporting() {
+        // Check whether NFC is available on device
+        if (nfcAdapter == null) {
+            // NFC is not available on the device.
+            Toast.makeText(this, "The device does not has NFC hardware.",
+                    Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
+
+        // Check whether device is running Android 4.1 or higher
+        else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            // Android Beam feature is not supported.
+            Toast.makeText(this, "Android Beam is not supported.",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    protected void checkForNFCAdapter() {
         if (!nfcAdapter.isEnabled()) {
-            Toast.makeText(this, "Plese Enable your NFC.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Please Enable your NFC.", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(android.provider.Settings.ACTION_NFC_SETTINGS));
-        }
-
-        if(!nfcAdapter.isNdefPushEnabled()){
-            Toast.makeText(this, "Plese Enable Android Beam.", Toast.LENGTH_LONG).show();
+        } else if (!nfcAdapter.isNdefPushEnabled()) {
+            Toast.makeText(this, "Please Enable Android Beam.", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(Settings.ACTION_NFCSHARING_SETTINGS));
+        } else {
+            Toast.makeText(this, "Ready to pay", Toast.LENGTH_SHORT).show();
         }
-        PurchaserMessage = (TextView) findViewById(R.id.PurchaserMessage);
-        if(Build.VERSION.SDK_INT >= 21){
-            //this.invokeBeam();
-        }
-        //this.invokeBeam();
-        /*if(allGood){
-
-ndefMessage = createNdefMessage();
-        nfcAdapter.setNdefPushMessage(ndefMessage,this);
-            }*/
-
-
-        //nfcAdapter.setOnNdefPushCompleteCallback(null,this);
     }
-
-   /* @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    protected void invokeBeam(){
-        nfcAdapter.invokeBeam(this);
-    }
-    /*@TargetApi(Build.VERSION_CODES.M)
-    protected boolean checkFingerprint(){
-        if((int) Build.VERSION.SDK_INT >= 23){
-            KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
-            FingerprintManager fingerprintManager = (FingerprintManager) getSystemService(FINGERPRINT_SERVICE);
-            if(fingerprintManager.isHardwareDetected()) {
-
-            }
-        }
-        return false;
-    }*/
 
     private NdefMessage createNdefMessage() {
-        String done = "Done";
-
-
         Gson gson = new Gson();
 
         String msg = gson.toJson(paymentInfo);
-        NdefRecord textRecord = new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE,externalType.getBytes(), new byte[0], msg.getBytes());
-        //NdefMessage message= new NdefMessage(new NdefRecord[] {textRecord,NdefRecord.createApplicationRecord("com.android.nfc.purchasersmartpay")});
-        NdefMessage message= new NdefMessage(textRecord);
+        //Setup NdefRecord
+        NdefRecord textRecord = new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, externalType.getBytes(), new byte[0], msg.getBytes());
+        NdefMessage message = new NdefMessage(textRecord);
         return message;
     }
 
     @Override
     protected void onResume() {
-        if (!nfcAdapter.isEnabled()) {
-            Toast.makeText(this, "Plese Enable your NFC.", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(android.provider.Settings.ACTION_NFC_SETTINGS));
-        }
-
-        if(!nfcAdapter.isNdefPushEnabled()){
-            Toast.makeText(this, "Plese Enable Android Beam.", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(Settings.ACTION_NFCSHARING_SETTINGS));
-        }
         super.onResume();
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-            receiveIntent(getIntent());      }
 
-        /*if(allGood){
-            ndefMessage = createNdefMessage();
-            nfcAdapter.setNdefPushMessage(ndefMessage,this);
-        }*/
+        checkForNFCAdapter();
+        checkNFCSupporting();
+
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
+            receiveIntent(getIntent());
+        }
     }
 
     private void receiveIntent(Intent intent) {
         NdefMessage messages = getNdefMessages(getIntent());
+        if (messages == null){
+            return;
+        }
 
         NdefRecord record = messages.getRecords()[0];
-        //String payload = new String (record.getPayload(),1,record.getPayload().length-1, Charset.forName("UTF-8"));
-        //String payload = new String (record.getPayload(),0,record.getPayload().length, Charset.forName("UTF-8"));
-        String payload = new String (record.getPayload());
+        String payload = new String(record.getPayload());
+        PurchaserMessage.setText(payload);
         allGood = true;
+
         Gson gson = new Gson();
-        paymentInfo = gson.fromJson(payload,PaymentInfo.class);
+        paymentInfo = gson.fromJson(payload, PaymentInfo.class);
 
         paymentInfo.setBillAmount(paymentInfo.getBillAmount());
         paymentInfo.setCompanyName("lol");
         paymentInfo.setCompanyType(123);
         paymentInfo.setPaymentDate(new Date());
-        PurchaserMessage.setText(payload);
 
-        if(allGood){
-
+        if (allGood) {
             ndefMessage = createNdefMessage();
-            nfcAdapter.setNdefPushMessage(ndefMessage,this);
+            nfcAdapter.setNdefPushMessage(ndefMessage, this);
         }
-
     }
 
     protected NdefMessage getNdefMessages(Intent intent) {
 
         Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-        //if (rawMsgs != null){
-        //NdefMessage msg = new NdefMessage[rawMsgs.length];
-        NdefMessage msg = (NdefMessage) rawMsgs[0];
-        //}
-            /*else {
-                byte [] empty = new byte [] {};
-                NdefRecord record = new NdefRecord(NdefRecord.TNF_WELL_KNOWN,empty,empty,empty);
-                NdefMessage msg = new NdefMessage(new NdefRecord[] {record});
-                msgs = new NdefMessage [] {
-                        msg
-                };
+        if (rawMsgs != null){
+         NdefMessage msg = (NdefMessage) rawMsgs[0];
+            return msg;
+        }
 
-            }*/
-
-        /*else{
-            Log.d("Error" , "UNknown intent");
-            finish();
-        }*/
-       /* String lol = new String (msg.getRecords()[0].getPayload());
-        PurchaserMessage.setText(lol);*/
-
-        return msg;
+        return null;
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
     }
-
-    /*@Override
-    public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
-        return null;
-    }*/
 }

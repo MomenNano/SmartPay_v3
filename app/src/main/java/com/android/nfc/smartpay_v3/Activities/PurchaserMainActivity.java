@@ -1,5 +1,7 @@
 package com.android.nfc.smartpay_v3.Activities;
 
+import android.content.SharedPreferences;
+import android.nfc.NfcEvent;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
@@ -9,19 +11,34 @@ import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.os.Parcelable;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.nfc.smartpay_v3.Classes.PaymentInfo;
+import com.android.nfc.smartpay_v3.DBA.Configuration;
 import com.android.nfc.smartpay_v3.R;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
-import java.util.Date;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class PurchaserMainActivity extends AppCompatActivity {
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+public class PurchaserMainActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback , NfcAdapter.OnNdefPushCompleteCallback{
     private NfcAdapter nfcAdapter;
     private TextView PurchaserMessage;
-    private NdefMessage ndefMessage;
+    //private NdefMessage ndefMessage;
     boolean allGood = false;
     protected String externalType = "nfclab.com:SmartPay";
     PaymentInfo paymentInfo = new PaymentInfo();
@@ -67,14 +84,61 @@ public class PurchaserMainActivity extends AppCompatActivity {
         }
     }
 
-    private NdefMessage createNdefMessage() {
+    /*private NdefMessage createNdefMessage() {
         Gson gson = new Gson();
 
         String msg = gson.toJson(paymentInfo);
+
+        //Send paymentInfo to the server
+        sendPurchasrePaymentInfo(msg);
         //Setup NdefRecord
         NdefRecord textRecord = new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, externalType.getBytes(), new byte[0], msg.getBytes());
+        //Setup NdefMessage
         NdefMessage message = new NdefMessage(textRecord);
         return message;
+    }*/
+
+    protected void sendPurchasrePaymentInfo(String msg) {
+        final String PurchaserPaymentInfoURL = "http://.ngrok.io/";
+        final RequestQueue requestQueue = Volley.newRequestQueue(PurchaserMainActivity.this);
+
+        JSONObject messageJsonRequest = null;
+        try {
+            messageJsonRequest = new JSONObject(msg);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, PurchaserPaymentInfoURL,messageJsonRequest,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if(response.getString("status").contains("true")){
+
+                                Toast.makeText(getApplicationContext(),"send Successfully",Toast.LENGTH_LONG).show();
+                            }
+                            else{
+                                Toast.makeText(getApplicationContext(),"Error, Try Again",Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            //e.printStackTrace();
+                        }
+                        Log.d("sucess","sucessfull login");
+                        requestQueue.stop();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(),"connection error",Toast.LENGTH_LONG).show();
+                        Log.d("error","error in login");
+
+                        requestQueue.stop();
+
+                    }
+                });
+
     }
 
     @Override
@@ -107,11 +171,15 @@ public class PurchaserMainActivity extends AppCompatActivity {
         paymentInfo.setCompanyName("lol");
         paymentInfo.setCompanyType(123);
         paymentInfo.setPaymentDate(new Date());
+        Log.d("create Message","createMessage");
 
         if (allGood) {
-            ndefMessage = createNdefMessage();
-            nfcAdapter.setNdefPushMessage(ndefMessage, this);
+            //NdefMessage ndefMessage = createNdefMessage();
+            nfcAdapter.setNdefPushMessageCallback(this, this);
+
         }
+        nfcAdapter.setOnNdefPushCompleteCallback(this,this);
+        Log.d("create Message","createMessage");
     }
 
     protected NdefMessage getNdefMessages(Intent intent) {
@@ -129,4 +197,74 @@ public class PurchaserMainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
     }
+
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent event) {
+        Log.d("create Message","createMessage");
+        Gson gson = new Gson();
+
+        String msg = gson.toJson(paymentInfo);
+
+        //Send paymentInfo to the server
+        sendPurchasrePaymentInfo(msg);
+        //Setup NdefRecord
+        NdefRecord textRecord = new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, externalType.getBytes(), new byte[0], msg.getBytes());
+        //Setup NdefMessage
+        NdefMessage message = new NdefMessage(textRecord);
+
+        return message;
+    }
+
+
+    @Override
+    public void onNdefPushComplete(NfcEvent event) {
+        System.out.print("LOL");
+        Log.d("sent","sent successfully");
+
+
+
+    }
+
+    /*protected void sendToServer(){
+        final String Transactionurl = "";
+        final RequestQueue requestQueue = Volley.newRequestQueue(PurchaserMainActivity.this);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Transactionurl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject JsonResponse = new JSONObject(response);
+                            if(JsonResponse.getString("status").contains("true")){
+
+                            }
+                            else{
+                                Toast.makeText(getApplicationContext(),"Wrong username or password",Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d("sucess","sucessfull login");
+                        requestQueue.stop();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(),"connection error",Toast.LENGTH_LONG).show();
+                        Log.d("error","error in login");
+                        requestQueue.stop();
+
+                    }
+                }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+                params.put("userName",username.getText().toString());
+                params.put("password",password.getText().toString());
+                return params;
+            }
+        };
+        requestQueue.add(stringRequest);
+    }*/
 }

@@ -21,6 +21,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +31,7 @@ import java.util.Map;
 
 public class LoginActivity extends Activity {
 
-    String myurl = "http://a7f68bb9.ngrok.io/login";
+    String myurl = "http://452d5e27.ngrok.io/login";
 
 
     @Override
@@ -58,12 +59,10 @@ public class LoginActivity extends Activity {
         Intent intent = new Intent(getApplicationContext(),PurchaserMainActivity.class);
         startActivity(intent);
 
-        final int result;
-
 
         final RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
 
-        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, myurl,null,
+        /*final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, myurl,null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -78,8 +77,6 @@ public class LoginActivity extends Activity {
                                 Toast.makeText(getApplicationContext(),"Login Successfully",Toast.LENGTH_LONG).show();
                                 Intent intent = new Intent(getApplicationContext(),MainActivity.class);
                                 startActivity(intent);
-
-
                             }
                             else{
                                 Toast.makeText(getApplicationContext(),"Wrong username or password",Toast.LENGTH_LONG).show();
@@ -110,23 +107,30 @@ public class LoginActivity extends Activity {
             }
         };
 
+        requestQueue.add(jsonObjectRequest);*/
+
         StringRequest stringRequest = new StringRequest(Request.Method.POST, myurl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        if(response.contains("true")){
-                            //localDBA.insertAccount(username.getText().toString(),password.getText().toString());
-                            SharedPreferences sharedPreferences = getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString(Configuration.KEY_PREFERENCE_USERNAME,username.getText().toString());
-
-                            editor.commit();
-                            Toast.makeText(getApplicationContext(),"Login Successfully",Toast.LENGTH_LONG).show();
-                            Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                            startActivity(intent);
-                        }
-                        else{
-                            Toast.makeText(getApplicationContext(),"Wrong username or password",Toast.LENGTH_LONG).show();
+                        try {
+                            JSONObject JsonResponse = new JSONObject(response);
+                            if(JsonResponse.getString("status").contains("true")){
+                                //localDBA.insertAccount(username.getText().toString(),password.getText().toString());
+                                SharedPreferences sharedPreferences = getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString(Configuration.KEY_PREFERENCE_USERNAME,username.getText().toString());
+                                editor.putString(Configuration.KEY_PREFERENCE_USER_ID,JsonResponse.getString(Configuration.KEY_PREFERENCE_USER_ID));
+                                editor.commit();
+                                Toast.makeText(getApplicationContext(),"Login Successfully",Toast.LENGTH_LONG).show();
+                                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                                startActivity(intent);
+                            }
+                            else{
+                                Toast.makeText(getApplicationContext(),"Wrong username or password",Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                         Log.d("sucess","sucessfull login");
                         requestQueue.stop();

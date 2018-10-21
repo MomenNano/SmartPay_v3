@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+
 import com.android.nfc.smartpay_v3.Classes.Card;
 import com.android.nfc.smartpay_v3.ClassesManagers.CardInfoManager;
 import com.android.nfc.smartpay_v3.DBA.Configuration;

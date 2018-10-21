@@ -18,6 +18,7 @@
         android:layout_marginTop="20dp"
         android:background="@drawable/cards_cont"
         android:backgroundTintMode="add"
+        android:elevation="24dp"
         android:orientation="vertical">
 
         <TextView
@@ -86,8 +87,7 @@
             android:layout_marginRight="33dp"
             android:layout_marginTop="7dp"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/bank_name_tv"
-            app:srcCompat="@drawable/chip" />
+            app:layout_constraintTop_toBottomOf="@+id/bank_name_tv" />
     </android.support.constraint.ConstraintLayout>
 
     <EditText
@@ -97,9 +97,11 @@
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
+        android:background="@drawable/edit_text_cont"
         android:ems="10"
         android:hint="Card Holder Name"
-        android:inputType="textPersonName" />
+        android:inputType="textPersonName"
+        android:padding="10dp" />
 
     <EditText
         android:id="@+id/card_number_et"
@@ -108,9 +110,11 @@
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
+        android:background="@drawable/edit_text_cont"
         android:ems="10"
         android:hint="Card No."
-        android:inputType="number" />
+        android:inputType="number"
+        android:padding="10dp" />
 
     <EditText
         android:id="@+id/expire_date_et"
@@ -119,9 +123,11 @@
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
+        android:background="@drawable/edit_text_cont"
         android:ems="10"
         android:hint="Ex Date"
-        android:inputType="date" />
+        android:inputType="date"
+        android:padding="10dp" />
 
     <Spinner
         android:id="@+id/banksspinner"
@@ -129,7 +135,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp" />
+        android:layout_marginRight="15dp"
+        android:background="@drawable/edit_text_cont" />
 
     <Button
         android:id="@+id/addNewCardBtn"

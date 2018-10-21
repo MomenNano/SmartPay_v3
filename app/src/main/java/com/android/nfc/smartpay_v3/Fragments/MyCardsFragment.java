@@ -1,6 +1,8 @@
 package com.android.nfc.smartpay_v3.Fragments;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -18,19 +20,33 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.android.nfc.smartpay_v3.DBA.MySingleton;
 import android.widget.Toast;
 
-import com.android.nfc.smartpay_v3.DBA.DBA;
-import com.android.nfc.smartpay_v3.DBA.LocalDBA;
+
+import com.android.nfc.smartpay_v3.Adapters.SlidePagerAdapter;
 import com.android.nfc.smartpay_v3.Classes.Card;
 import com.android.nfc.smartpay_v3.Classes.PaymentInfo;
 import com.android.nfc.smartpay_v3.ClassesManagers.CardPaymentInfoManager;
+import com.android.nfc.smartpay_v3.DBA.Configuration;
+import com.android.nfc.smartpay_v3.DBA.DBA;
+import com.android.nfc.smartpay_v3.DBA.LocalDBA;
+import com.android.nfc.smartpay_v3.DBA.MySingleton;
 import com.android.nfc.smartpay_v3.R;
-import com.android.nfc.smartpay_v3.Adapters.SlidePagerAdapter;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Fifty on 5/6/2018.
@@ -52,7 +68,8 @@ public class MyCardsFragment extends Fragment {
         collapsingToolbarContent.removeAllViewsInLayout();
         collapseView = inflater.inflate(R.layout.my_cards_collapse_layout,container,false);
         slidePager = (ViewPager) collapseView.findViewById(R.id.slidePager);
-        slidePagerAdapter = new SlidePagerAdapter(getActivity().getBaseContext());
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Configuration.MY_PREFERENCE, Context.MODE_PRIVATE);
+        slidePagerAdapter = new SlidePagerAdapter(getActivity().getBaseContext(),sharedPreferences);
         slidePager.setAdapter(slidePagerAdapter);
         slidePager.setOnPageChangeListener(viewPagerListener);
         recyclerView = (RecyclerView) myView.findViewById(R.id.card_payment_history_recycler_view);
@@ -112,9 +129,9 @@ public class MyCardsFragment extends Fragment {
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm a");
             holder.paymentObj = paymentList.get(position);
             holder.companeyNameTextView.setText(holder.paymentObj.getCompanyName());
-            holder.paymentDateTextView.setText(dateFormat.format(holder.paymentObj.getPaymentDate()));
-            holder.paymentTimeTextView.setText(timeFormat.format(holder.paymentObj.getPaymentDate()));
-            holder.billAmountTextView.setText(String.valueOf(holder.paymentObj.getBillAmount()));
+            holder.paymentDateTextView.setText(holder.paymentObj.getStringDate());
+            holder.paymentTimeTextView.setText(holder.paymentObj.getStringTime());
+            holder.billAmountTextView.setText(holder.paymentObj.getBillAmount());
             if(holder.paymentObj.getCompanyType()==1)
                 holder.companeyIcon.setImageResource(R.mipmap.coffee_icon);
 
@@ -153,25 +170,55 @@ public class MyCardsFragment extends Fragment {
         }
     };
     public void deduct(){
-        EditText moneyToDeduct = (EditText) getView().findViewById(R.id.et_money_to_deduct);
-        double money = Double.valueOf(moneyToDeduct.getText().toString());
-        DBA dba = new DBA();
-        int result = dba.deductMoneyFromBank(money);
-        if (result == 1){
-            int position = slidePager.getCurrentItem();
-            LocalDBA localDBA = new LocalDBA(getActivity().getBaseContext());
-            ArrayList<Card> cardArrayList = localDBA.getAllCards();
-            localDBA.updateBalance(cardArrayList.get(position).getCardBalance()+money,cardArrayList.get(position).getCardNo());
-            slidePagerAdapter.notifyDataSetChanged();
-            Toast.makeText(getActivity().getBaseContext(), "Yor money has been deducted successfully", Toast.LENGTH_SHORT).show();
-        }
-        else if(result == 2){
-            Toast.makeText(getActivity().getBaseContext(), "Sorry you bank Account doesn't have this amount of money", Toast.LENGTH_SHORT).show();
-        }
-        else{
-            Toast.makeText(getActivity().getBaseContext(), "Sorry something went wrong check your internet connection and try again", Toast.LENGTH_SHORT).show();
-        }
+        final EditText moneyToDeduct = (EditText) getView().findViewById(R.id.et_money_to_deduct);
+        final double money = Double.valueOf(moneyToDeduct.getText().toString());
+        final int position = slidePager.getCurrentItem();
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Configuration.DEDUCT_MONEY_URL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            if (jsonObject.getString(Configuration.CODE).compareTo("1") == 0){
+                                LocalDBA localDBA = new LocalDBA(getActivity().getBaseContext());
+                                ArrayList<Card> cardArrayList = localDBA.getAllCards();
+                                localDBA.updateBalance(cardArrayList.get(position).getCardBalance()+money,cardArrayList.get(position).getCardNo());
+                                slidePagerAdapter.notifyDataSetChanged();
+                                Toast.makeText(getActivity().getBaseContext(), jsonObject.getString(Configuration.MESSAGE), Toast.LENGTH_SHORT).show();
+                            }else if (jsonObject.getString(Configuration.CODE).compareTo("1") == 0){
+                                Toast.makeText(getActivity().getBaseContext(), jsonObject.getString(Configuration.MESSAGE), Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getActivity().getBaseContext(), "Something went wrong try again", Toast.LENGTH_SHORT).show();
+            }
+
+        })
+        {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                LocalDBA localDBA = new LocalDBA(getActivity().getBaseContext());
+                ArrayList<Card> cardArrayList = localDBA.getAllCards();
+                Map<String,String> parms = new HashMap<>();
+                parms.put(Configuration.KEY_CARD_NO,cardArrayList.get(position).getCardNo());
+                parms.put(Configuration.KEY_CARD_BANK_NAME,cardArrayList.get(position).getBankName());
+                parms.put(Configuration.MONEY_TO_DEDUCT,moneyToDeduct.getText().toString());
+                parms.put(Configuration.KEY_CARD_HOLDER_NAME,cardArrayList.get(position).getCardHolderName());
+                return parms;
+            }
+        };
+//        MySingleton.getInstance(getActivity().getApplicationContext()).addToRequestQueue(stringRequest);
+        MySingleton.getInstance(getActivity().getApplicationContext()).addToRequestQueue(stringRequest);
     }
+
+
 
 
 }

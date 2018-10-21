@@ -168,9 +168,8 @@ public class PurchaserMainActivity extends AppCompatActivity implements NfcAdapt
         paymentInfo = gson.fromJson(payload, PaymentInfo.class);
 
         paymentInfo.setBillAmount(paymentInfo.getBillAmount());
-        paymentInfo.setCompanyName("lol");
-        paymentInfo.setCompanyType(123);
-        paymentInfo.setPaymentDate(new Date());
+
+        paymentInfo.setDate(new Date());
         Log.d("create Message","createMessage");
 
         if (allGood) {

@@ -54,7 +54,7 @@ public class RegisterActivity extends AppCompatActivity {
         phone = (EditText) findViewById(R.id.et_phone_no);
         Account account = new Account();
 
-        if(password.getText().toString().compareToIgnoreCase(confirmPassword.getText().toString())==0){
+        if(password.getText().toString().compareTo(confirmPassword.getText().toString())==0){
             account.setUsername(username.getText().toString());
             account.setFullName(fullname.getText().toString());
             account.setPassword(password.getText().toString());

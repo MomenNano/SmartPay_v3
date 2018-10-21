@@ -4,16 +4,16 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
+import com.android.nfc.smartpay_v3.Classes.Card;
+import com.android.nfc.smartpay_v3.DBA.Configuration;
+import com.android.nfc.smartpay_v3.DBA.LocalDBA;
+import com.android.nfc.smartpay_v3.DBA.MySingleton;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.nfc.smartpay_v3.Classes.Card;
-import com.android.nfc.smartpay_v3.Classes.PaymentInfo;
-import com.android.nfc.smartpay_v3.DBA.Configuration;
-import com.android.nfc.smartpay_v3.DBA.LocalDBA;
-import com.android.nfc.smartpay_v3.DBA.MySingleton;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,12 +36,15 @@ public class CardInfoManager {
         this.context = context;
         this.sharedPreferences = sharedPreferences;
         LocalDBA localDBA = new LocalDBA(context);
-        ArrayList cardsList = localDBA.getAllCards();
-        if (cardsList.isEmpty()){
-
+        cardInfoList = localDBA.getAllCards();
+        if (cardInfoList.isEmpty()){
+            getCardsFromServer();
+            for (int i = 0 ; i<cardInfoList.size(); i++){
+                localDBA.insertCard(cardInfoList.get(i));
+            }
         }
         cardInfoManager = this;
-        this.cardInfoList = cardsList ;
+
 
     }
     public ArrayList<Card> getCardsInfoList(){

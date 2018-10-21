@@ -1,6 +1,8 @@
 package com.android.nfc.smartpay_v3.Fragments;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Editable;
@@ -16,20 +18,20 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.nfc.smartpay_v3.Adapters.BankAdapter;
+import com.android.nfc.smartpay_v3.Classes.BankItem;
+import com.android.nfc.smartpay_v3.Classes.Card;
+import com.android.nfc.smartpay_v3.DBA.Configuration;
+import com.android.nfc.smartpay_v3.DBA.LocalDBA;
+import com.android.nfc.smartpay_v3.DBA.MySingleton;
+import com.android.nfc.smartpay_v3.R;
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.nfc.smartpay_v3.Adapters.BankAdapter;
-import com.android.nfc.smartpay_v3.Classes.Account;
-import com.android.nfc.smartpay_v3.Classes.BankItem;
-import com.android.nfc.smartpay_v3.DBA.Configuration;
-import com.android.nfc.smartpay_v3.DBA.DBA;
-import com.android.nfc.smartpay_v3.DBA.LocalDBA;
-import com.android.nfc.smartpay_v3.Classes.Card;
-import com.android.nfc.smartpay_v3.DBA.MySingleton;
-import com.android.nfc.smartpay_v3.R;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -167,13 +169,21 @@ public class AddCardFragment extends Fragment {
 
     private void initBanksList() {
         bankItemArrayList = new ArrayList<BankItem>();
-        bankItemArrayList.add(new BankItem("Fisal Bank",R.mipmap.fisal_bank_icon));
+        bankItemArrayList.add(new BankItem("Fisal Islamic Bank",R.mipmap.fisal_bank_icon));
         bankItemArrayList.add(new BankItem("Omdurman National Bank",R.mipmap.omdurman_bank_icon));
         bankItemArrayList.add(new BankItem("Khartoum National Bank",R.mipmap.khartoum_bank_icon));
     }
     public void addNewCard(){
         String cardHolderName = tv_cardHolderName.getText().toString();
-        String cardBankName = tv_cardBankName.getText().toString();
+        String cardBankName= tv_cardBankName.getText().toString();
+        String dbName="";
+        if (tv_cardBankName.getText().toString().compareToIgnoreCase("Fisal Islamic Bank")==0){
+            dbName = "faisal_bankdb";
+        } else if (tv_cardBankName.getText().toString().compareToIgnoreCase("Omdurman National Bank")==0){
+            dbName = "omdurman_bankdb";
+        } else if (tv_cardBankName.getText().toString().compareToIgnoreCase("Khartoum National Bank")==0){
+            dbName = "khartoum_bankdb";
+        }
         String cardExDate = tv_exDate.getText().toString();
         String cardNo = tv_cardNo.getText().toString();
         if(cardHolderName.isEmpty() || cardBankName.isEmpty() || cardExDate.isEmpty() || cardNo.isEmpty() == false) {
@@ -182,6 +192,8 @@ public class AddCardFragment extends Fragment {
             card.setCardHolderName(cardHolderName);
             card.setCardNo(cardNo);
             card.setBankName(cardBankName);
+            card.setStringBankName(dbName);
+            card.setExDate(cardExDate);
             card.setCardIcon(spinner.getSelectedItemPosition());
             addCardToServer(card);
 
@@ -192,18 +204,18 @@ public class AddCardFragment extends Fragment {
     }
     public void addCardToServer(final Card card){ //send new Card information to the server
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, Configuration.REGISTER_URL,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Configuration.ADD_NEW_CARD_URL,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("successfully") == 0){
+                            if (jsonObject.getString(Configuration.CODE).compareTo("1") == 0){
                                 LocalDBA localDBA = new LocalDBA(getActivity().getBaseContext());
                                 localDBA.insertCard(card);
                                 Toast.makeText(getActivity().getBaseContext(), jsonObject.getString(Configuration.KEY_MESSAGE), Toast.LENGTH_SHORT).show();
                             }
-                            else if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("not supported") == 0){
+                            else if (jsonObject.getString(Configuration.CODE).compareTo("0") == 0){
                                 Toast.makeText(getActivity().getBaseContext(),jsonObject.getString(Configuration.KEY_MESSAGE), Toast.LENGTH_SHORT).show();
                             }
                             else if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("expired") == 0){
@@ -227,13 +239,21 @@ public class AddCardFragment extends Fragment {
         {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
+                SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Configuration.MY_PREFERENCE,Context.MODE_PRIVATE);
                 Map<String,String> parms = new HashMap<>();
                 parms.put(Configuration.KEY_CARD_NO,card.getCardNo());
-                parms.put(Configuration.KEY_CARD_BANK_NAME,card.getBankName());
+                parms.put(Configuration.KEY_CARD_BANK_NAME,card.getStringBankName());
                 parms.put(Configuration.KEY_CARD_HOLDER_NAME,card.getCardHolderName());
+                parms.put(Configuration.KEY_CARD_EX_DATE,card.getExDate());
+                parms.put(Configuration.KEY_PHONE_SERIAL_NO,sharedPreferences.getString(Configuration.KEY_PHONE_SERIAL_NO,""));
+                parms.put(Configuration.KEY_PURCHASER_ID,sharedPreferences.getString(Configuration.KEY_PREFERENCE_USER_ID,""));
                 return parms;
             }
         };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2,
+                0,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         MySingleton.getInstance(getActivity().getApplicationContext()).addToRequestQueue(stringRequest);
 
     }

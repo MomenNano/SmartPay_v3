@@ -11,6 +11,8 @@ public class Card {
     double cardBalance;
     int cardFlag;
     int cardIcon;
+    String exDate;
+    String stringBankName;
 
 
     public Card(String bankName, String cardNo, int cardIcon) {
@@ -25,6 +27,14 @@ public class Card {
 
     public String getBankName() {
         return bankName;
+    }
+
+    public String getStringBankName() {
+        return stringBankName;
+    }
+
+    public void setStringBankName(String stringBankName) {
+        this.stringBankName = stringBankName;
     }
 
     public void setBankName(String bankName) {
@@ -69,5 +79,13 @@ public class Card {
 
     public void setCardFlag(int cardFlag) {
         this.cardFlag = cardFlag;
+    }
+
+    public String getExDate() {
+        return exDate;
+    }
+
+    public void setExDate(String exDate) {
+        this.exDate = exDate;
     }
 }

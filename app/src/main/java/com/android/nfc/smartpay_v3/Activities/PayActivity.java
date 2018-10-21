@@ -1,223 +1,269 @@
 package com.android.nfc.smartpay_v3.Activities;
 
-import android.app.Activity;
-import android.app.AlertDialog;
+import android.content.SharedPreferences;
+import android.nfc.NfcEvent;
+import android.os.Build;
+import android.provider.Settings;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
-import android.nfc.NfcEvent;
-import android.os.Build;
 import android.os.Parcelable;
-import android.provider.Settings;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
+import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.nfc.smartpay_v3.DBA.DBA;
-import com.android.nfc.smartpay_v3.Classes.BillInfo;
 import com.android.nfc.smartpay_v3.Classes.PaymentInfo;
+import com.android.nfc.smartpay_v3.DBA.Configuration;
 import com.android.nfc.smartpay_v3.R;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-public class PayActivity extends Activity {
+public class PayActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback , NfcAdapter.OnNdefPushCompleteCallback{
     private NfcAdapter nfcAdapter;
-    private ArrayList<String> messagesToSendArray = new ArrayList<>();
-    private ArrayList<byte[]> messagesReceivedArray = new ArrayList<>();
-    /*BillInfo billInfo = new BillInfo();
+    private TextView PurchaserMessage;
+    //private NdefMessage ndefMessage;
+    boolean allGood = false;
+    protected String externalType = "nfclab.com:SmartPay";
+    PaymentInfo paymentInfo = new PaymentInfo();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pay);
-        PackageManager pm = getPackageManager();
-        // Check whether NFC is available on device
-        if (!pm.hasSystemFeature(PackageManager.FEATURE_NFC)) {
-            // NFC is not available on the device.
-            Toast.makeText(getBaseContext(), "The device does not has NFC hardware.",
-                    Toast.LENGTH_SHORT).show();
-        }
-        // Check whether device is running Android 4.1 or higher
-        else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            // Android Beam feature is not supported.
-            Toast.makeText(getBaseContext(), "Android Beam is not supported.",
-                    Toast.LENGTH_SHORT).show();
-        }
-        else {
-            // NFC and Android Beam file transfer is supported.
-            Toast.makeText(getBaseContext(), "Android Beam is supported on your device.",
-                    Toast.LENGTH_SHORT).show();
-        }
-        nfcAdapter = NfcAdapter.getDefaultAdapter(getBaseContext());
+        setContentView(R.layout.activity_purchaser_main);
 
-        // Check whether NFC is enabled on device
-        if(!nfcAdapter.isEnabled()){
-            // NFC is disabled, show the settings UI
-            // to enable NFC
-            Toast.makeText(getBaseContext(), "Please enable NFC.",
-                    Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(Settings.ACTION_NFC_SETTINGS));
-        }
-        // Check whether Android Beam feature is enabled on device
-        else if(!nfcAdapter.isNdefPushEnabled()) {
-            // Android Beam is disabled, show the settings UI
-            // to enable Android Beam
-            Toast.makeText(getBaseContext(), "Please enable Android Beam.",
-                    Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(Settings.ACTION_NFCSHARING_SETTINGS));
-        }
-        if(nfcAdapter != null) {
-            //This will refer back to createNdefMessage for what it will send
-            nfcAdapter.setNdefPushMessageCallback(this, this);
-            //This will be called if the message is sent successfully
-            nfcAdapter.setOnNdefPushCompleteCallback(this, this);
-        }
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+        PurchaserMessage = (TextView) findViewById(R.id.PurchaserMessage);
 
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        handleNfcIntent(intent);
+    protected void checkNFCSupporting() {
+        // Check whether NFC is available on device
+        if (nfcAdapter == null) {
+            // NFC is not available on the device.
+            Toast.makeText(this, "The device does not has NFC hardware.",
+                    Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        // Check whether device is running Android 4.1 or higher
+        else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            // Android Beam feature is not supported.
+            Toast.makeText(this, "Android Beam is not supported.",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    protected void checkForNFCAdapter() {
+        if (!nfcAdapter.isEnabled()) {
+            Toast.makeText(this, "Please Enable your NFC.", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(android.provider.Settings.ACTION_NFC_SETTINGS));
+        } else if (!nfcAdapter.isNdefPushEnabled()) {
+            Toast.makeText(this, "Please Enable Android Beam.", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(Settings.ACTION_NFCSHARING_SETTINGS));
+        } else {
+            Toast.makeText(this, "Ready to pay", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /*private NdefMessage createNdefMessage() {
+        Gson gson = new Gson();
+
+        String msg = gson.toJson(paymentInfo);
+
+        //Send paymentInfo to the server
+        sendPurchasrePaymentInfo(msg);
+        //Setup NdefRecord
+        NdefRecord textRecord = new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, externalType.getBytes(), new byte[0], msg.getBytes());
+        //Setup NdefMessage
+        NdefMessage message = new NdefMessage(textRecord);
+        return message;
+    }*/
+
+    protected void sendPurchasrePaymentInfo(String msg) {
+        final String PurchaserPaymentInfoURL = "http://.ngrok.io/";
+        final RequestQueue requestQueue = Volley.newRequestQueue(PayActivity.this);
+
+        JSONObject messageJsonRequest = null;
+        try {
+            messageJsonRequest = new JSONObject(msg);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, PurchaserPaymentInfoURL,messageJsonRequest,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if(response.getString("status").contains("true")){
+
+                                Toast.makeText(getApplicationContext(),"send Successfully",Toast.LENGTH_LONG).show();
+                            }
+                            else{
+                                Toast.makeText(getApplicationContext(),"Error, Try Again",Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            //e.printStackTrace();
+                        }
+                        Log.d("sucess","sucessfull login");
+                        requestQueue.stop();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(),"connection error",Toast.LENGTH_LONG).show();
+                        Log.d("error","error in login");
+
+                        requestQueue.stop();
+
+                    }
+                });
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        handleNfcIntent(getIntent());
+
+        checkForNFCAdapter();
+        checkNFCSupporting();
+
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
+            receiveIntent(getIntent());
+        }
     }
 
+    private void receiveIntent(Intent intent) {
+        NdefMessage messages = getNdefMessages(getIntent());
+        if (messages == null){
+            return;
+        }
 
-    public static byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(out);
-        os.writeObject(obj);
-        return out.toByteArray();
+        NdefRecord record = messages.getRecords()[0];
+        String payload = new String(record.getPayload());
+        PurchaserMessage.setText(payload);
+        allGood = true;
+
+        Gson gson = new Gson();
+        paymentInfo = gson.fromJson(payload, PaymentInfo.class);
+
+        paymentInfo.setBillAmount(paymentInfo.getBillAmount());
+
+        paymentInfo.setDate(new Date());
+        Log.d("create Message","createMessage");
+
+        if (allGood) {
+            //NdefMessage ndefMessage = createNdefMessage();
+            nfcAdapter.setNdefPushMessageCallback(this, this);
+
+        }
+        nfcAdapter.setOnNdefPushCompleteCallback(this,this);
+        Log.d("create Message","createMessage");
     }
 
-    public static Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
-        ObjectInputStream is = new ObjectInputStream(in);
-        return is.readObject();
+    protected NdefMessage getNdefMessages(Intent intent) {
+
+        Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+        if (rawMsgs != null){
+            NdefMessage msg = (NdefMessage) rawMsgs[0];
+            return msg;
+        }
+
+        return null;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
     }
 
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
-        NdefRecord recordsToAttatch = createRecords();
-        return new NdefMessage(recordsToAttatch);
+        Log.d("create Message","createMessage");
+        Gson gson = new Gson();
+
+        String msg = gson.toJson(paymentInfo);
+
+        //Send paymentInfo to the server
+        sendPurchasrePaymentInfo(msg);
+        //Setup NdefRecord
+        NdefRecord textRecord = new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, externalType.getBytes(), new byte[0], msg.getBytes());
+        //Setup NdefMessage
+        NdefMessage message = new NdefMessage(textRecord);
+
+        return message;
     }
+
 
     @Override
     public void onNdefPushComplete(NfcEvent event) {
-        Toast.makeText(this, "Message has been send Successfully", Toast.LENGTH_LONG).show();
-        messageSendSuccessfully();
-    }
+        System.out.print("LOL");
+        Log.d("sent","sent successfully");
 
 
-    public NdefRecord createRecords(){
-        NdefRecord record ;
-        PaymentInfo paymentInfo = new PaymentInfo();
-        Date today = new Date();
-        paymentInfo.setCompanyName(billInfo.getCompaney().getName());
-        paymentInfo.setBillAmount(billInfo.getBillAmount());
-        paymentInfo.setCompanyType(billInfo.getCompaney().getType());
-        paymentInfo.setPaymentDate(today);
-        byte[] payload ;
-
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            try {
-                payload = serialize(paymentInfo);
-                record = new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT,"PaymentInfo".getBytes(), payload);
-                return record;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        else {
-            try {
-                payload = serialize(paymentInfo);
-                record = NdefRecord.createMime("text/plain",payload);
-                return record;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-        return null;
 
     }
-    private void handleNfcIntent(Intent NfcIntent){
 
-        if(nfcAdapter.ACTION_NDEF_DISCOVERED.equals(NfcIntent.getAction())){
-            Parcelable [] reciveArray = NfcIntent.getParcelableArrayExtra(nfcAdapter.EXTRA_NDEF_MESSAGES);
-            if (reciveArray != null){
-                messagesReceivedArray.clear();
-                NdefMessage recivedMessage = (NdefMessage) reciveArray[0];
-                NdefRecord [] attachedRecords = recivedMessage.getRecords();
-                for( NdefRecord record:attachedRecords){
-                    byte [] payloaad = record.getPayload();
-                    if (payloaad.equals(getPackageName())){
-                        continue;
+    /*protected void sendToServer(){
+        final String Transactionurl = "";
+        final RequestQueue requestQueue = Volley.newRequestQueue(PurchaserMainActivity.this);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Transactionurl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject JsonResponse = new JSONObject(response);
+                            if(JsonResponse.getString("status").contains("true")){
+
+                            }
+                            else{
+                                Toast.makeText(getApplicationContext(),"Wrong username or password",Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d("sucess","sucessfull login");
+                        requestQueue.stop();
                     }
-                    String recordID = Arrays.toString(record.getId());
-                    if (recordID.compareToIgnoreCase("PaymentInfo")==0){
-                        receivedBillInfo(record.getPayload());
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(),"connection error",Toast.LENGTH_LONG).show();
+                        Log.d("error","error in login");
+                        requestQueue.stop();
+
                     }
-                    else {
-
-                        messagesReceivedArray.add(payloaad);
-                        Toast.makeText(this, "Received " + messagesReceivedArray.size() + " Messages", Toast.LENGTH_LONG).show();
-                        //the Message Received Successfully
-                        messageReceived();
-                    }
-                }
+                }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+                params.put("userName",username.getText().toString());
+                params.put("password",password.getText().toString());
+                return params;
             }
-            else {
-                Toast.makeText(this, "Something Went Wrong", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    private void messageReceived() {
-        PaymentInfo paymentInfo;
-        DBA dba = new DBA();
-        try {
-            paymentInfo = (PaymentInfo) deserialize(messagesReceivedArray.get(0));
-            dba.insertPaymentInfoToDB(paymentInfo);
-            AlertDialog.Builder alert = new AlertDialog.Builder(this);
-            LayoutInflater inflater = this.getLayoutInflater();
-            View alertView = inflater.inflate(R.layout.payment_successfully_done_dialog,null);
-            alert.setView(alertView);
-
-
-
-            alert.create().show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-    public void receivedBillInfo(byte [] payload){
-        try {
-            billInfo = (BillInfo) deserialize(payload);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void messageSendSuccessfully() {
-
+        };
+        requestQueue.add(stringRequest);
     }*/
 }

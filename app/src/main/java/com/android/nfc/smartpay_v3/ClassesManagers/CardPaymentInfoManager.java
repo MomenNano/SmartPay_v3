@@ -2,6 +2,7 @@ package com.android.nfc.smartpay_v3.ClassesManagers;
 
 import android.content.Context;
 
+
 import com.android.nfc.smartpay_v3.Classes.PaymentInfo;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class CardPaymentInfoManager {
             paymentInfo.setCompanyName("Riyadh Cafe");
             paymentInfo.setBillAmount("250");
             paymentInfo.setCompanyType(1);
-            paymentInfo.setPaymentDate(today);
+            paymentInfo.setDate(today);
             paymentInfosList.add(paymentInfo);
         }
     }

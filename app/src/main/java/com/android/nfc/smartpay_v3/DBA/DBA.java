@@ -1,13 +1,26 @@
 package com.android.nfc.smartpay_v3.DBA;
 
-import com.android.nfc.smartpay_v3.Classes.Companey;
+import android.content.Context;
+
 import com.android.nfc.smartpay_v3.Classes.Card;
+import com.android.nfc.smartpay_v3.Classes.Companey;
 import com.android.nfc.smartpay_v3.Classes.PaymentInfo;
 import com.android.nfc.smartpay_v3.R;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.appdatasearch.GetRecentContextCall;
 import com.google.android.gms.maps.model.LatLng;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Fifty on 6/6/2018.
@@ -24,7 +37,7 @@ public class DBA {
             "Omdurman National Bank",
             "Bank Of Khartoum"
     };
-    public Card createNewCardDBA(String CardHolderName, String CardNo, String CardEXDate, String BankName,int cardIcon){
+    public Card createNewCardDBA(String CardHolderName, String CardNo, String CardEXDate, String BankName, int cardIcon){
         Card card = new Card();
         card.setBankName(BankName);
         card.setCardHolderName(CardHolderName);
@@ -55,7 +68,7 @@ public class DBA {
             paymentInfo.setCompanyName("Riyadh Cafe");
             paymentInfo.setBillAmount("250");
             paymentInfo.setCompanyType(1);
-            paymentInfo.setPaymentDate(today);
+            paymentInfo.setDate(today);
             paymentInfosList.add(paymentInfo);
         }
         return paymentInfosList;

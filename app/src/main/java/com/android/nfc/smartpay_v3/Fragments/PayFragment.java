@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+
 import com.android.nfc.smartpay_v3.R;
 
 import java.io.ByteArrayInputStream;

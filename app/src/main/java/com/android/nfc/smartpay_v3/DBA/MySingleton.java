@@ -8,9 +8,12 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
-
+/**
+ * Created by Fifty on 6/29/2018.
+ */
 
 public class MySingleton {
+    private static MySingleton ourInstance;
     private static MySingleton mInstance;
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
@@ -20,7 +23,6 @@ public class MySingleton {
         mCtx = context;
         mRequestQueue = getRequestQueue();
 
-
     }
 
     public static synchronized MySingleton getInstance(Context context) {
@@ -28,7 +30,6 @@ public class MySingleton {
             mInstance = new MySingleton(context);
         }
         return mInstance;
-
     }
 
     public RequestQueue getRequestQueue() {
@@ -44,5 +45,8 @@ public class MySingleton {
         getRequestQueue().add(req);
     }
 
+    public ImageLoader getImageLoader() {
+        return mImageLoader;
+    }
 
 }

@@ -13,8 +13,7 @@
         android:layout_height="398dp"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
-        android:layout_marginTop="5dp"
-        app:srcCompat="@drawable/fispngsmallvertical" />
+        android:layout_marginTop="5dp" />
 
     <TextView
         android:id="@+id/textView12"

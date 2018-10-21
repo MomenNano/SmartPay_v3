@@ -7,18 +7,14 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 
-import com.android.volley.AuthFailureError;
+import com.android.nfc.smartpay_v3.Classes.Companey;
+import com.android.nfc.smartpay_v3.DBA.Configuration;
+import com.android.nfc.smartpay_v3.DBA.MySingleton;
+import com.android.nfc.smartpay_v3.R;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.nfc.smartpay_v3.Classes.Companey;
-import com.android.nfc.smartpay_v3.DBA.Configuration;
-import com.android.nfc.smartpay_v3.DBA.DBA;
-import com.android.nfc.smartpay_v3.DBA.LocalDBA;
-import com.android.nfc.smartpay_v3.DBA.MySingleton;
-import com.android.nfc.smartpay_v3.R;
 import com.google.android.gms.location.LocationListener;
 
 import android.os.Build;
@@ -94,7 +90,7 @@ public class MapFragment extends Fragment implements
             public void onMapReady(final GoogleMap mMap) {
                 googleMap = mMap;
 
-                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (ContextCompat.checkSelfPermission(getActivity().getBaseContext(),
                             Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {

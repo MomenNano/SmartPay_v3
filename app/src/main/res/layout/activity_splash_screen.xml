@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="461dp"
         android:scaleType="centerCrop"
-        android:background="@drawable/splash_screen"
+        android:src="@drawable/b1"
         tools:layout_editor_absoluteX="77dp"
         tools:layout_editor_absoluteY="155dp" />
 

@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.android.nfc.smartpay_v3.Classes.Account;
 import com.android.nfc.smartpay_v3.DBA.Configuration;
 import com.android.nfc.smartpay_v3.DBA.DBA;
 import com.android.nfc.smartpay_v3.DBA.LocalDBA;
@@ -38,6 +39,8 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.android.nfc.smartpay_v3.DBA.Configuration.MY_PREFERENCE;
 
 public class LoginActivity extends Activity {
 
@@ -105,11 +108,10 @@ public class LoginActivity extends Activity {
     public void login(View view) {
         final EditText username = (EditText) findViewById(R.id.login_username);
         final EditText password = (EditText) findViewById(R.id.login_password);
-          Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-          startActivity(intent);
 
 
-        /*final RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
+
+        final RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
 
         final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, myurl,null,
                 new Response.Listener<JSONObject>() {
@@ -118,7 +120,7 @@ public class LoginActivity extends Activity {
                         try {
                             if(response.getString("status").contains("true")){
                                 //localDBA.insertAccount(username.getText().toString(),password.getText().toString());
-                                SharedPreferences sharedPreferences = getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
+                                SharedPreferences sharedPreferences = getSharedPreferences(MY_PREFERENCE,MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putString(Configuration.KEY_PREFERENCE_USERNAME,username.getText().toString());
                                 editor.putString(Configuration.KEY_PREFERENCE_USER_ID,response.getString(Configuration.KEY_PREFERENCE_USER_ID));
@@ -156,13 +158,61 @@ public class LoginActivity extends Activity {
             }
         };
 
-        requestQueue.add(jsonObjectRequest);*/
+        requestQueue.add(jsonObjectRequest);
 
     }
-    public void register(View view){
+    public void registerToServer(final Account account){ //Register send Account information from account object the server and storing them in the database
+        r_username = findViewById(R.id.r_username);
+        r_password = findViewById(R.id.r_password);
+        r_confirm_password = findViewById(R.id.r_confirm_password);
+        r_user_phone_no = findViewById(R.id.r_user_phone_no);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Configuration.REGISTER_URL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("successfully") == 0){
+                                openSession(r_username.getText().toString(),jsonObject.getString(Configuration.KEY_USER_ID));
+                            }
+                            else if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("failed") == 0){
+                                Toast.makeText(getBaseContext(), jsonObject.getString(Configuration.KEY_MESSAGE), Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
-        Intent intent = new Intent(this,RegisterActivity.class);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getBaseContext(), "Something went wrong try again", Toast.LENGTH_SHORT).show();
+            }
+
+        })
+        {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> parms = new HashMap<>();
+                parms.put(Configuration.kEY_USERNAME,r_username.getText().toString());
+                parms.put(Configuration.KEY_PASSWORD,r_password.getText().toString());
+                parms.put(Configuration.KEY_PHONE_NO,r_user_phone_no.getText().toString());
+                return parms;
+            }
+        };
+        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
+
+    }
+    public void openSession(String username,String userID){
+        SharedPreferences sharedPreferences = getSharedPreferences(MY_PREFERENCE,MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Configuration.KEY_PREFERENCE_USER_ID,userID);
+        editor.putString(Configuration.KEY_PREFERENCE_USERNAME,username);
+        editor.apply();
+        Toast.makeText(getBaseContext(),"Registered Successfully",Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(getBaseContext(),MainActivity.class);
         startActivity(intent);
     }
+
 
 }

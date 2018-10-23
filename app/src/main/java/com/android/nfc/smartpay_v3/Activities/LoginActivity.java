@@ -106,8 +106,8 @@ public class LoginActivity extends Activity {
     }
 
     public void login(View view) {
-        final EditText username = (EditText) findViewById(R.id.login_username);
-        final EditText password = (EditText) findViewById(R.id.login_password);
+         l_username = (EditText) findViewById(R.id.login_username);
+         l_password = (EditText) findViewById(R.id.login_password);
 
 
 
@@ -122,7 +122,7 @@ public class LoginActivity extends Activity {
                                 //localDBA.insertAccount(username.getText().toString(),password.getText().toString());
                                 SharedPreferences sharedPreferences = getSharedPreferences(MY_PREFERENCE,MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString(Configuration.KEY_PREFERENCE_USERNAME,username.getText().toString());
+                                editor.putString(Configuration.KEY_PREFERENCE_USERNAME,l_username.getText().toString());
                                 editor.putString(Configuration.KEY_PREFERENCE_USER_ID,response.getString(Configuration.KEY_PREFERENCE_USER_ID));
                                 editor.commit();
                                 Toast.makeText(getApplicationContext(),"Login Successfully",Toast.LENGTH_LONG).show();
@@ -152,8 +152,8 @@ public class LoginActivity extends Activity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put("userName", username.getText().toString());
-                params.put("password", password.getText().toString());
+                params.put("userName", l_username.getText().toString());
+                params.put("password", l_password.getText().toString());
                 return params;
             }
         };

@@ -274,7 +274,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:background="@drawable/btn_cont"
-                    android:onClick="register"
+                    android:onClick="registerToServer"
                     android:paddingLeft="50dp"
                     android:paddingRight="50dp"
                     android:text="Register"

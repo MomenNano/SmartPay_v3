@@ -161,7 +161,7 @@ public class LoginActivity extends Activity {
         requestQueue.add(jsonObjectRequest);
 
     }
-    public void registerToServer(final Account account){ //Register send Account information from account object the server and storing them in the database
+    public void registerToServer(View view){ //Register send Account information from account object the server and storing them in the database
         r_username = findViewById(R.id.r_username);
         r_password = findViewById(R.id.r_password);
         r_confirm_password = findViewById(R.id.r_confirm_password);

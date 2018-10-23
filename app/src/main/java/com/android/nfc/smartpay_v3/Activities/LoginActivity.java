@@ -68,7 +68,6 @@ public class LoginActivity extends Activity {
         openRegister = (Button) findViewById(R.id.open_register);
         loginBtn = (Button) findViewById(R.id.login);
         logo = (ImageView) findViewById(R.id.logo);
-        System.out.println("lol");
 
         openLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,35 +107,41 @@ public class LoginActivity extends Activity {
     public void login(View view) {
          l_username = (EditText) findViewById(R.id.login_username);
          l_password = (EditText) findViewById(R.id.login_password);
+         System.out.println("LLLLLLLLLLLLLL="+l_username.getText().toString());
+         System.out.println("sssssssssssss="+l_password.getText().toString());
 
 
+         RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
 
-        final RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
-
-        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, myurl,null,
-                new Response.Listener<JSONObject>() {
+         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST,myurl,
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(String response) {
+                        System.out.println(response);
                         try {
-                            if(response.getString("status").contains("true")){
+                            JSONObject jsonObject = new JSONObject(response);
+                            System.out.println("zzzzzzzzzzzzzzzzz="+jsonObject.getString("code"));
+
+                            String id = jsonObject.getString(Configuration.KEY_PREFERENCE_USER_ID);
+
+                            if(jsonObject.getString("code").compareToIgnoreCase("1")==0){
                                 //localDBA.insertAccount(username.getText().toString(),password.getText().toString());
                                 SharedPreferences sharedPreferences = getSharedPreferences(MY_PREFERENCE,MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putString(Configuration.KEY_PREFERENCE_USERNAME,l_username.getText().toString());
-                                editor.putString(Configuration.KEY_PREFERENCE_USER_ID,response.getString(Configuration.KEY_PREFERENCE_USER_ID));
+                                editor.putString(Configuration.KEY_PREFERENCE_USER_ID,id);
                                 editor.apply();
-                                Toast.makeText(getApplicationContext(),"Login Successfully",Toast.LENGTH_LONG).show();
-                                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                                Toast.makeText(getBaseContext(),"Login Successfully",Toast.LENGTH_LONG).show();
+                                Intent intent = new Intent(getBaseContext(),MainActivity.class);
                                 startActivity(intent);
                             }
                             else{
-                                Toast.makeText(getApplicationContext(),"Wrong username or password",Toast.LENGTH_LONG).show();
+                                Toast.makeText(getBaseContext(),"Wrong username or password",Toast.LENGTH_LONG).show();
                             }
                         } catch (JSONException e) {
                             //e.printStackTrace();
                         }
                         Log.d("sucess","sucessfull login");
-                        requestQueue.stop();
                     }
                 },
                 new Response.ErrorListener() {
@@ -144,8 +149,6 @@ public class LoginActivity extends Activity {
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getApplicationContext(),"connection error",Toast.LENGTH_LONG).show();
                         Log.d("error","error in login");
-
-                        requestQueue.stop();
 
                     }
                 }) {

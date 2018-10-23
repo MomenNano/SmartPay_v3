@@ -67,7 +67,7 @@ public class Configuration {
     public static final String KEY_PAYMENT_TIME = "";
     //Sheared Preference Keys
     public static final String MY_PREFERENCE = "user_session";
-    public static final String KEY_PREFERENCE_USER_ID = "user_id";
+    public static final String KEY_PREFERENCE_USER_ID = "purchaser_id";
     public static final String KEY_PREFERENCE_USERNAME = "username";
 
 

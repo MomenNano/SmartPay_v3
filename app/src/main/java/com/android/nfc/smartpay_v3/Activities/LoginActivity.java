@@ -107,8 +107,6 @@ public class LoginActivity extends Activity {
     public void login(View view) {
          l_username = (EditText) findViewById(R.id.login_username);
          l_password = (EditText) findViewById(R.id.login_password);
-         System.out.println("LLLLLLLLLLLLLL="+l_username.getText().toString());
-         System.out.println("sssssssssssss="+l_password.getText().toString());
 
 
          RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
@@ -120,7 +118,6 @@ public class LoginActivity extends Activity {
                         System.out.println(response);
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            System.out.println("zzzzzzzzzzzzzzzzz="+jsonObject.getString("code"));
 
                             String id = jsonObject.getString(Configuration.KEY_PREFERENCE_USER_ID);
 

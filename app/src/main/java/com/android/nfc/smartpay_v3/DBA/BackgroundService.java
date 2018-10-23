@@ -32,22 +32,22 @@ import java.util.Map;
 public class BackgroundService extends IntentService {
     public static boolean servicesRun = false;
     ArrayList<PaymentInfo> paymentInfoArrayList = new ArrayList<>();
-    SharedPreferences sharedPreferences ;
+    //SharedPreferences sharedPreferences ;
     public BackgroundService() {
         super("ServerRequest");
     }
 
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-        sharedPreferences = getApplicationContext().getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
+        //sharedPreferences = getApplicationContext().getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
         //the next line is for Testing need to be deleted later
         for (int i = 0 ; i < 3 ; i++){
             PaymentInfo paymentInfo = new PaymentInfo();
             paymentInfo.setBillAmount("500");
             paymentInfo.setUniqueId(Build.SERIAL);
             paymentInfo.setCardId("123456789");
-            paymentInfo.setPurchaserId("123456789");
-            paymentInfo.setCompanyId("88");
+            paymentInfo.setPurchaserId("9");
+            paymentInfo.setCompanyId("1");
             paymentInfo.setPurchaserName("Mohamed Al-Ameen");
             paymentInfo.setCompanyBankAccount("89798456231");
             paymentInfo.setCompanyType(2);

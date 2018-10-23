@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.android.nfc.smartpay_v3.DBA.BackgroundService;
 import com.android.nfc.smartpay_v3.DBA.Configuration;
 import com.android.nfc.smartpay_v3.Fragments.AddCardFragment;
 import com.android.nfc.smartpay_v3.Fragments.HistoryFragment;
@@ -35,6 +36,9 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        BackgroundService.servicesRun = true;
+        Intent service = new Intent(getBaseContext(),BackgroundService.class);
+        startService(service);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -51,7 +55,6 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
         navigationView.setNavigationItemSelectedListener(this);
     }
 

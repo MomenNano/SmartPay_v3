@@ -105,13 +105,13 @@ public class LoginActivity extends Activity {
     public void login(View view) {
         final EditText username = (EditText) findViewById(R.id.login_username);
         final EditText password = (EditText) findViewById(R.id.login_password);
-//        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-//        startActivity(intent);
+          Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+          startActivity(intent);
 
 
-        final RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
+        /*final RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
 
-        /*final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, myurl,null,
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, myurl,null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -158,94 +158,6 @@ public class LoginActivity extends Activity {
 
         requestQueue.add(jsonObjectRequest);*/
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, myurl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject JsonResponse = new JSONObject(response);
-                            if (JsonResponse.getString("status").contains("true")) {
-
-
-                                //localDBA.insertAccount(username.getText().toString(),password.getText().toString());
-                                SharedPreferences sharedPreferences = getSharedPreferences(Configuration.MY_PREFERENCE, MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString(Configuration.KEY_PREFERENCE_USERNAME, username.getText().toString());
-                                editor.putString(Configuration.KEY_PREFERENCE_USER_ID, JsonResponse.getString(Configuration.KEY_PURCHASER_ID));
-                                editor.putString(Configuration.KEY_PHONE_SERIAL_NO, Build.SERIAL);
-                                editor.commit();
-
-                                Toast.makeText(getApplicationContext(),"Login Successfully",Toast.LENGTH_LONG).show();
-                                Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                                startActivity(intent);
-//                                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-//                                startActivity(intent);
-                                //if(sharedPreferences != null && sharedPreferences.getString(Configuration.KEY_PREFERENCE_USERNAME,null) != null){
-//                                    Intent intent = new Intent(getBaseContext(),MainActivity.class);
-//                                    startActivity(intent);
-                                //}
-                            }
-                            else{
-                                Toast.makeText(getApplicationContext(),"Wrong username or password",Toast.LENGTH_LONG).show();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        Log.d("sucess","sucessfull login");
-                        //requestQueue.stop();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(),"connection error",Toast.LENGTH_LONG).show();
-                        Log.d("error","error in login");
-                        requestQueue.stop();
-
-                    }
-                }){
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params = new HashMap<>();
-                params.put("userName",username.getText().toString());
-                params.put("password",password.getText().toString());
-                return params;
-            }
-        };
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2,
-                0,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        //requestQueue.add(stringRequest);
-        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
-
-        /*//localDBA.insertAccount(username.getText().toString(),password.getText().toString());
-        SharedPreferences sharedPreferences = getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(Configuration.KEY_PREFERENCE_USERNAME,username.getText().toString());
-        editor.putInt("user_id",response);
-        editor.commit();
-        Toast.makeText(this,"Login Successfully",Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-        startActivity(intent);
-
-        LocalDBA localDBA = new LocalDBA(this);
-        DBA dba = new DBA();
-        /*int result = dba.login(username.getText().toString(),password.getText().toString());
-        if (result!=-1){
-            //localDBA.insertAccount(username.getText().toString(),password.getText().toString());
-            SharedPreferences sharedPreferences = getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(Configuration.KEY_PREFERENCE_USERNAME,username.getText().toString());
-            editor.putInt("user_id",result);
-            editor.commit();
-            Toast.makeText(this,"Login Successfully",Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-            startActivity(intent);
-        }
-        else{
-            Toast.makeText(this,"sorry username or password is wrong",Toast.LENGTH_LONG).show();
-        }*/
     }
     public void register(View view){
 

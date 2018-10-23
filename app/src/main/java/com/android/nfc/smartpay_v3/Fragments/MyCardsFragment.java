@@ -106,8 +106,7 @@ public class MyCardsFragment extends Fragment {
                 super(itemView);
                 companeyNameTextView = (TextView) itemView.findViewById(R.id.company_name);
                 billAmountTextView = (TextView) itemView.findViewById(R.id.bill_amount);
-                paymentTimeTextView = (TextView) itemView.findViewById(R.id.payment_time);
-                paymentDateTextView = (TextView) itemView.findViewById(R.id.payment_date);
+                paymentDateTextView = (TextView) itemView.findViewById(R.id.date);
                 companeyIcon = (ImageView) itemView.findViewById(R.id.company_icon);
             }
 

@@ -124,7 +124,7 @@ public class LoginActivity extends Activity {
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putString(Configuration.KEY_PREFERENCE_USERNAME,l_username.getText().toString());
                                 editor.putString(Configuration.KEY_PREFERENCE_USER_ID,response.getString(Configuration.KEY_PREFERENCE_USER_ID));
-                                editor.commit();
+                                editor.apply();
                                 Toast.makeText(getApplicationContext(),"Login Successfully",Toast.LENGTH_LONG).show();
                                 Intent intent = new Intent(getApplicationContext(),MainActivity.class);
                                 startActivity(intent);
@@ -152,8 +152,10 @@ public class LoginActivity extends Activity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put("userName", l_username.getText().toString());
-                params.put("password", l_password.getText().toString());
+                params.put(Configuration.kEY_USERNAME, l_username.getText().toString());
+                params.put(Configuration.KEY_PASSWORD, l_password.getText().toString());
+                System.out.println(params.get(Configuration.kEY_USERNAME));
+                System.out.println(params.get(Configuration.KEY_PASSWORD));
                 return params;
             }
         };

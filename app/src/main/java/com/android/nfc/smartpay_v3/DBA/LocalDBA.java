@@ -103,6 +103,8 @@ public class LocalDBA extends SQLiteOpenHelper  {
                 ,new String[]{Integer.toString(id)});
         return true;
     }
+
+
     public ArrayList<PaymentInfo> getAllPaymentTransaction(){
         ArrayList<PaymentInfo> paymentInfoArrayList = new ArrayList<PaymentInfo>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -185,54 +187,6 @@ public class LocalDBA extends SQLiteOpenHelper  {
 
 
 
-/*    public boolean insertAccount(int userid , String username , String password  , String phone , String email , double balance , String address , int flag){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("a_id",userid);
-        contentValues.put("a_username",username);
-        contentValues.put("a_password",password);
-        contentValues.put("a_phone",phone);
-        contentValues.put("a_email",email);
-        contentValues.put("a_balance",balance);
-        contentValues.put("a_address",address);
-        contentValues.put("a_flag",1);
-        db.insert("Accounts",null,contentValues);
-        return true;
-    }
-    public boolean UpdateAccount(Integer id ,String username , String password){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("a_username",username);
-        contentValues.put("a_password",password);
-        db.update("Accounts",contentValues,"id = ?",new String[]{Integer.toString(id)});
-        return true;
-    }
-    public Integer deleteAccount(Integer id){
-        SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete("Accounts","id = ?",new String[]{Integer.toString(id)});
-    }
-
-    public ArrayList<Account> getAllAccounts(){
-        ArrayList<Account> accountArrayList = new ArrayList<Account>();
-        //hp = new hashmap
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor result = db.rawQuery("Select * from Accounts",null);
-        result.moveToFirst();
-        while (result.isAfterLast() == false){
-            Account account = new Account();
-            account.setUsername(result.getString(result.getColumnIndex(ACCOUNT_COLUMN_USERNAME)));
-            account.setUserid(result.getInt(result.getColumnIndex(ACCOUNT_COLUMN_USER_ID)));
-            account.setAddress(result.getString(result.getColumnIndex(ACCOUNT_COLUMN_ADDRESS)));
-            account.setBalance(result.getDouble(result.getColumnIndex(ACCOUNT_COLUMN_BALANCE)));
-            account.setEmail(result.getString(result.getColumnIndex(ACCOUNT_COLUMN_EMAIL)));
-            account.setPassword(result.getString(result.getColumnIndex(ACCOUNT_COLUMN_PASSWORD)));
-            account.setPhone(result.getString(result.getColumnIndex(ACCOUNT_COLUMN_PHONE)));
-            account.setFlag(result.getInt(result.getColumnIndex(ACCOUNT_COLUMN_FLAG)));
-            accountArrayList.add(account);
-            result.moveToNext();
-        }
-        return accountArrayList;
-    }*/
 
     public boolean insertCard(Card card){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -271,5 +225,19 @@ public class LocalDBA extends SQLiteOpenHelper  {
         contentValues.put(CARDS_COLUMN_BALANCE,balance);
         db.update(CARDS_TABLE_NAME,contentValues,CARDS_COLUMN_CARDNO+"="+cardNo,null);
         return true;
+    }
+    public boolean withdrawBalance(double balance,String cardNo){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor result = db.rawQuery("Select * from "+CARDS_TABLE_NAME+"where"+CARDS_COLUMN_CARDNO+"="+cardNo,null);
+        result.moveToFirst();
+        while (result.isAfterLast() == false) {
+            Card card = new Card();
+            card.setCardBalance(Double.valueOf(result.getString(result.getColumnIndex(CARDS_COLUMN_BALANCE))));
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(CARDS_COLUMN_BALANCE, card.getCardBalance()-balance);
+            db.update(CARDS_TABLE_NAME, contentValues, CARDS_COLUMN_CARDNO + "=" + cardNo, null);
+            return true;
+        }
+        return false;
     }
 }

@@ -107,6 +107,9 @@ public class WalletFragment extends Fragment {
     public void UpdateUI(){
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Configuration.MY_PREFERENCE, Context.MODE_PRIVATE);
         ArrayList<Card> cardArrayList = CardInfoManager.getCardsInfoManager(getActivity().getBaseContext(),sharedPreferences).getCardsInfoList();
+        if (cardArrayList.isEmpty()){
+            return;
+        }
         if (this.adapter == null && !cardArrayList.isEmpty()){
             CardsAdapter cAdapter = new CardsAdapter(cardArrayList);
             adapter = cAdapter;

@@ -124,15 +124,12 @@ public class MyCardsFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(PayHolder holder, int position) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm a");
             holder.paymentObj = paymentList.get(position);
             holder.companeyNameTextView.setText(holder.paymentObj.getCompanyName());
             holder.paymentDateTextView.setText(holder.paymentObj.getStringDate());
-            holder.paymentTimeTextView.setText(holder.paymentObj.getStringTime());
             holder.billAmountTextView.setText(holder.paymentObj.getBillAmount());
             if(holder.paymentObj.getCompanyType()==1)
-                holder.companeyIcon.setImageResource(R.mipmap.coffee_icon);
+                holder.companeyIcon.setImageResource(R.mipmap.desert_icon_round);
 
         }
 

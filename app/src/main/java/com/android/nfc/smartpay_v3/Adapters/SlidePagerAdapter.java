@@ -2,6 +2,7 @@ package com.android.nfc.smartpay_v3.Adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,6 +80,11 @@ public class SlidePagerAdapter extends PagerAdapter {
         ImageView slideIcon = (ImageView) view.findViewById(R.id.slider_latout_card_image);
         TextView cardBalance = (TextView) view .findViewById(R.id.card_balance);
         slideIcon.setImageResource(slideImage[cardArrayList.get(position).getCardIcon()]);
+        slideIcon.setBackgroundResource(slideImage[cardArrayList.get(position).getCardIcon()]);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            slideIcon.setImageDrawable(context.getDrawable(slideImage[cardArrayList.get(position).getCardIcon()]));
+        }else{
+        }
         cardBalance.setText(String.valueOf(cardArrayList.get(position).getCardBalance()));
         container.addView(view);
         return view;

@@ -13,6 +13,7 @@ public class Card {
     int cardIcon;
     String exDate;
     String stringBankName;
+    int cardId;
 
 
     public Card(String bankName, String cardNo, int cardIcon) {
@@ -23,6 +24,14 @@ public class Card {
 
     public Card() {
 
+    }
+
+    public int getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(int cardId) {
+        this.cardId = cardId;
     }
 
     public String getBankName() {

@@ -41,7 +41,7 @@ public class BackgroundService extends IntentService {
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
         //sharedPreferences = getApplicationContext().getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
         //the next line is for Testing need to be deleted later
-        for (int i = 0 ; i < 3 ; i++){
+        /*for (int i = 0 ; i < 3 ; i++){
             PaymentInfo paymentInfo = new PaymentInfo();
             paymentInfo.setBillAmount("500");
             paymentInfo.setUniqueId(Build.SERIAL);
@@ -55,7 +55,7 @@ public class BackgroundService extends IntentService {
             paymentInfo.setCompanyName("Area 51");
             paymentInfo.setFlag(1);
             LocalDBA.getInstance(getApplicationContext()).insertPaymentTransaction(paymentInfo);
-        }
+        }*/
         Toast.makeText(getBaseContext(), "Service is Start"+servicesRun, Toast.LENGTH_LONG).show();
         servicesRun = true;
         Toast.makeText(getBaseContext(), "Service is Start"+servicesRun, Toast.LENGTH_LONG).show();

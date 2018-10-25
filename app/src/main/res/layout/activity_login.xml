@@ -84,7 +84,7 @@
                     android:inputType="textPersonName"
                     android:outlineProvider="bounds"
                     android:padding="10dp"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@color/mainTextColor2" />
 
                 <TextView
                     android:id="@+id/textView3"
@@ -108,7 +108,7 @@
                     android:inputType="textPassword"
                     android:outlineProvider="bounds"
                     android:padding="10dp"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@color/mainTextColor2" />
 
                 <Button
                     android:id="@+id/login"
@@ -129,9 +129,9 @@
                     android:layout_marginTop="20dp"
                     android:gravity="bottom"
                     android:orientation="horizontal"
-                    android:paddingBottom="5dp"
                     android:paddingLeft="15dp"
-                    android:paddingRight="15dp">
+                    android:paddingRight="15dp"
+                    android:paddingBottom="5dp">
 
                     <Button
                         android:id="@+id/open_register"
@@ -197,7 +197,8 @@
                     android:ems="10"
                     android:inputType="textPersonName"
                     android:outlineProvider="bounds"
-                    android:padding="10dp" />
+                    android:padding="10dp"
+                    android:textColor="@color/mainTextColor2" />
 
                 <TextView
                     android:id="@+id/textView6"
@@ -220,7 +221,8 @@
                     android:ems="10"
                     android:inputType="textPersonName"
                     android:outlineProvider="bounds"
-                    android:padding="10dp" />
+                    android:padding="10dp"
+                    android:textColor="@color/mainTextColor2" />
 
                 <TextView
                     android:id="@+id/textView8"
@@ -243,7 +245,8 @@
                     android:ems="10"
                     android:inputType="textPersonName"
                     android:outlineProvider="bounds"
-                    android:padding="10dp" />
+                    android:padding="10dp"
+                    android:textColor="@color/mainTextColor2" />
 
                 <TextView
                     android:id="@+id/textView7"
@@ -266,7 +269,8 @@
                     android:ems="10"
                     android:inputType="textPersonName"
                     android:outlineProvider="bounds"
-                    android:padding="10dp" />
+                    android:padding="10dp"
+                    android:textColor="@color/mainTextColor2" />
 
                 <Button
                     android:id="@+id/button4"

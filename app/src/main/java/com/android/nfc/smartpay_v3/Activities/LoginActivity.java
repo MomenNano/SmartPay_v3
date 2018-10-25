@@ -108,7 +108,8 @@ public class LoginActivity extends Activity {
          l_username = (EditText) findViewById(R.id.login_username);
          l_password = (EditText) findViewById(R.id.login_password);
 
-
+        Intent intent = new Intent(getBaseContext(),MainActivity.class);
+        startActivity(intent);
          RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
 
          StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST,myurl,

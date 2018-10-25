@@ -27,6 +27,7 @@ import com.android.nfc.smartpay_v3.R;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    //jgfghjj
     final static String MY_PREFERENCE = "user_session";
     private static final  String FULLNAME = "full_name";
     private static final  String USER_ID = "user_id";

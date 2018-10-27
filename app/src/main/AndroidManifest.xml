@@ -1,15 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.nfc.smartpay_v3">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.NFC" />
-    <uses-feature android:name="android.hardware.nfc" android:required="true"/>
+
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="true" />
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
-    <uses-permission android:name="android.permission.USE_FINGERPRINT" android:requiredFeature="false" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission
+        android:name="android.permission.USE_FINGERPRINT"
+        android:requiredFeature="false" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-feature
         android:name="android.hardware.nfc"
@@ -26,7 +32,6 @@
             android:name="android.nfc.disable_beam_default"
             android:value="true" />
 
-
         <activity android:name=".Activities.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,22 +46,39 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activities.PurchaserMainActivity">
-
             <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="vnd.android.nfc"
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
                     android:host="ext"
-                    android:pathPrefix="/nfclab.com:SmartPay" />
+                    android:pathPrefix="/nfclab.com:SmartPay"
+                    android:scheme="vnd.android.nfc" />
             </intent-filter>
         </activity>
-    <activity
-        android:name=".Activities.MainActivity"
-        android:label="@string/title_activity_main"
-        android:theme="@style/AppTheme.NoActionBar" />
-    <activity android:name=".Activities.PayActivity" />
-    <activity android:name=".Activities.RegisterActivity"></activity>
-        <service android:name=".DBA.BackgroundService"
-            android:exported="false"/>
+        <activity
+            android:name=".Activities.MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Activities.PayActivity" />
+        <activity android:name=".Activities.RegisterActivity" />
+
+        <service
+            android:name=".DBA.BackgroundService"
+            android:exported="false" />
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
     </application>
+
 </manifest>

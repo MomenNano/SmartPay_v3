@@ -219,6 +219,17 @@ public class LocalDBA extends SQLiteOpenHelper  {
         }
         return cardArrayList;
     }
+    public double getWalletBalance(){
+        double balance = 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor result = db.rawQuery("Select * from Cards",null);
+        result.moveToFirst();
+        while (result.isAfterLast() == false){
+            balance=balance+result.getDouble(result.getColumnIndex(CARDS_COLUMN_BALANCE));
+            result.moveToNext();
+        }
+        return balance;
+    }
     public boolean updateBalance(double balance,String cardNo){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();

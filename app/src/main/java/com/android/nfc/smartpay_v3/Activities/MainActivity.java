@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity
         usernameTextView.setText(sharedPreferences.getString(FULLNAME,null));
         emailTextView.setText(sharedPreferences.getString(EMAIL,null));
         FragmentManager fragmentManager = getFragmentManager();
-        /*fragmentManager.beginTransaction().replace(R.id.content_frame,new MapFragment()).commit();*/
+        fragmentManager.beginTransaction().replace(R.id.content_frame, new WalletFragment()).commit();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -104,7 +104,8 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_pay) {
             fragmentManager.beginTransaction().replace(R.id.content_frame, new PayFragment()).commit();
-
+            Intent intent = new Intent(getBaseContext(),PurchaserMainActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_map) {
         fragmentManager.beginTransaction().replace(R.id.content_frame, new MapFragment()).commit();
 

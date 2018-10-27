@@ -66,6 +66,7 @@ public class MyCardsFragment extends Fragment {
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) getActivity().findViewById(R.id.collapsing_toolbar_layout);
         LinearLayout collapsingToolbarContent = (LinearLayout) getActivity().findViewById(R.id.collapsing_toolbar_content);
         collapsingToolbarContent.removeAllViewsInLayout();
+        collapsingToolbarContent.setVisibility(View.VISIBLE);
         collapseView = inflater.inflate(R.layout.my_cards_collapse_layout,container,false);
         slidePager = (ViewPager) collapseView.findViewById(R.id.slidePager);
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Configuration.MY_PREFERENCE, Context.MODE_PRIVATE);

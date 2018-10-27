@@ -2,6 +2,9 @@ package com.android.nfc.smartpay_v3.Activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -10,11 +13,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.nfc.smartpay_v3.Classes.Account;
@@ -57,11 +63,18 @@ public class LoginActivity extends Activity {
             loginLayout.setVisibility(View.VISIBLE);
         }
     };
+    AlertDialog alert;
+    LayoutInflater inflater;
+    View alertView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        alert = new AlertDialog.Builder(this).create();
+        alertView = View.inflate(getBaseContext(),R.layout.progress_dialog,null);
+        inflater = getLayoutInflater();
+        alert.setView(alertView);
         loginLayout = (LinearLayout) findViewById(R.id.login_Layout);
         registerLayout = (LinearLayout) findViewById(R.id.register_layout);
         openLogin = (Button) findViewById(R.id.open_login);
@@ -108,11 +121,11 @@ public class LoginActivity extends Activity {
          l_username = (EditText) findViewById(R.id.login_username);
          l_password = (EditText) findViewById(R.id.login_password);
 
-        Intent intent = new Intent(getBaseContext(),MainActivity.class);
-        startActivity(intent);
+        /*Intent intent = new Intent(getBaseContext(),MainActivity.class);
+        startActivity(intent);*/
          RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
 
-         StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST,myurl,
+         final StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST,myurl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -120,21 +133,23 @@ public class LoginActivity extends Activity {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
 
-                            String id = jsonObject.getString(Configuration.KEY_PREFERENCE_USER_ID);
+                            String id = jsonObject.getString(Configuration.KEY_PURCHASER_ID);
 
                             if(jsonObject.getString("code").compareToIgnoreCase("1")==0){
                                 //localDBA.insertAccount(username.getText().toString(),password.getText().toString());
                                 SharedPreferences sharedPreferences = getSharedPreferences(MY_PREFERENCE,MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putString(Configuration.KEY_PREFERENCE_USERNAME,l_username.getText().toString());
-                                editor.putString(Configuration.KEY_PREFERENCE_USER_ID,id);
+                                editor.putString(Configuration.KEY_PURCHASER_ID,id);
                                 editor.apply();
                                 Toast.makeText(getBaseContext(),"Login Successfully",Toast.LENGTH_LONG).show();
+                                dismiss();
                                 Intent intent = new Intent(getBaseContext(),MainActivity.class);
                                 startActivity(intent);
-                            }
+                                }
                             else{
                                 Toast.makeText(getBaseContext(),"Wrong username or password",Toast.LENGTH_LONG).show();
+                                dismissProgressBar("Wrong username or password");
                             }
                         } catch (JSONException e) {
                             //e.printStackTrace();
@@ -145,9 +160,9 @@ public class LoginActivity extends Activity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(),"connection error",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),"Something went wrong try again",Toast.LENGTH_LONG).show();
                         Log.d("error","error in login");
-
+                        dismissProgressBar("Something went wrong try again");
                     }
                 }) {
             @Override
@@ -155,6 +170,9 @@ public class LoginActivity extends Activity {
                 Map<String, String> params = new HashMap<>();
                 params.put(Configuration.kEY_USERNAME, l_username.getText().toString());
                 params.put(Configuration.KEY_PASSWORD, l_password.getText().toString());
+                params.put(Configuration.KEY_PHONE_SERIAL_NO,Build.SERIAL);
+                params.put(Configuration.KEY_PHONE_BRAND,Build.BRAND);
+                params.put(Configuration.KEY_PHONE_MODEL,Build.MODEL);
                 System.out.println(params.get(Configuration.kEY_USERNAME));
                 System.out.println(params.get(Configuration.KEY_PASSWORD));
                 return params;
@@ -162,6 +180,9 @@ public class LoginActivity extends Activity {
         };
 
         requestQueue.add(jsonObjectRequest);
+        showProgressBar("Logging...");
+
+
 
     }
     public void registerToServer(View view){ //Register send Account information from account object the server and storing them in the database
@@ -177,9 +198,11 @@ public class LoginActivity extends Activity {
                             JSONObject jsonObject = new JSONObject(response);
                             if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("successfully") == 0){
                                 openSession(r_username.getText().toString(),jsonObject.getString(Configuration.KEY_USER_ID));
+                                dismiss();
                             }
                             else if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("failed") == 0){
                                 Toast.makeText(getBaseContext(), jsonObject.getString(Configuration.KEY_MESSAGE), Toast.LENGTH_SHORT).show();
+                                dismissProgressBar(jsonObject.getString(Configuration.KEY_MESSAGE));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -190,6 +213,7 @@ public class LoginActivity extends Activity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(getBaseContext(), "Something went wrong try again", Toast.LENGTH_SHORT).show();
+                dismissProgressBar("Something went wrong try again");
             }
 
         })
@@ -204,7 +228,7 @@ public class LoginActivity extends Activity {
             }
         };
         MySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
-
+        showProgressBar("Registering...");
     }
     public void openSession(String username,String userID){
         SharedPreferences sharedPreferences = getSharedPreferences(MY_PREFERENCE,MODE_PRIVATE);
@@ -216,6 +240,27 @@ public class LoginActivity extends Activity {
         Intent intent = new Intent(getBaseContext(),MainActivity.class);
         startActivity(intent);
     }
-
+    public void showProgressBar(String str){
+        ProgressBar progressBar = alertView.findViewById(R.id.progressBar2);
+        progressBar.setVisibility(View.VISIBLE);
+        TextView msg = alertView.findViewById(R.id.progress_msg);
+        msg.setText(str);
+        alert.show();
+    }
+    public void dismissProgressBar(String str){
+        ProgressBar progressBar = alertView.findViewById(R.id.progressBar2);
+        progressBar.setVisibility(View.GONE);
+        TextView msg = alertView.findViewById(R.id.progress_msg);
+        msg.setText(str);
+        alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                alert.dismiss();
+            }
+        });
+    }
+    public void dismiss(){
+        alert.dismiss();
+    }
 
 }

@@ -54,8 +54,6 @@ public class SlidePagerAdapter extends PagerAdapter {
         }
     }
 
-
-
     public int [] slideImage= {
             R.drawable.fispngsmall,
             R.drawable.omb,
@@ -80,12 +78,11 @@ public class SlidePagerAdapter extends PagerAdapter {
         ImageView slideIcon = (ImageView) view.findViewById(R.id.slider_latout_card_image);
         TextView cardBalance = (TextView) view .findViewById(R.id.card_balance);
         slideIcon.setImageResource(slideImage[cardArrayList.get(position).getCardIcon()]);
-        slideIcon.setBackgroundResource(slideImage[cardArrayList.get(position).getCardIcon()]);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            slideIcon.setImageDrawable(context.getDrawable(slideImage[cardArrayList.get(position).getCardIcon()]));
-        }else{
-        }
-        cardBalance.setText(String.valueOf(cardArrayList.get(position).getCardBalance()));
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Configuration.MY_PREFERENCE,Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Configuration.KEY_CARD_NO,cardArrayList.get(position).getCardNo());
+        editor.apply();
+        cardBalance.setText(String.valueOf(cardArrayList.get(position).getCardBalance())+" SDG");
         container.addView(view);
         return view;
     }

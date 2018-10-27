@@ -6,15 +6,15 @@ package com.android.nfc.smartpay_v3.DBA;
 
 public class Configuration {
     //SERVER URLS
-    public static final String REGISTER_URL = "http://72aa30f5.ngrok.io/register/purchaser";
-    public static final String LOGIN_URL = "http://72aa30f5.ngrok.io/login/purchaser";
-    public static final String SEND_PAYMENT_INFO_URL = "http://72aa30f5.ngrok.io/add/purchaser/payment";
-    public static final String PAY_TRANSACTION_URL = "http://72aa30f5.ngrok.io/add/purchaser/payment";
+    public static final String REGISTER_URL = "http://b811efd0.ngrok.io/register/purchaser";
+    public static final String LOGIN_URL = "http://b811efd0.ngrok.io/login/purchaser";
+    public static final String SEND_PAYMENT_INFO_URL = "http://b811efd0.ngrok.io/seller/add/purchaser/payment";
+    public static final String PAY_TRANSACTION_URL = "http://b811efd0.ngrok.io/seller/add/purchaser/payment";
     public static final String PAYMENT_HISTORY_URL = "";
-    public static final String DEDUCT_MONEY_URL = "http://72aa30f5.ngrok.io/deduct";
-    public static final String ADD_NEW_CARD_URL = "http://72aa30f5.ngrok.io/addCard";
+    public static final String DEDUCT_MONEY_URL = "http://b811efd0.ngrok.io/deduct";
+    public static final String ADD_NEW_CARD_URL = "http://b811efd0.ngrok.io/addCard";
     public static final String  GET_STORES_URL = "";
-    public static final String CHECK_PAYMENT_INFO_URL = "http://72aa30f5.ngrok.io/add/purchaser/payment/check";
+    public static final String CHECK_PAYMENT_INFO_URL = "http://b811efd0.ngrok.io/seller/add/purchaser/payment/check";
 
 
 
@@ -23,7 +23,7 @@ public class Configuration {
     public static final String KEY_MESSAGE = "message";
     //User Tables Keys
     public static final String KEY_USER_ID = "";
-    public static final String kEY_USERNAME = "userName";
+    public static final String kEY_USERNAME = "username";
     public static final String KEY_FULL_NAME = "fullName";
     public static final String KEY_PASSWORD = "password";
     public static final String KEY_EMAIL = "email";
@@ -36,6 +36,8 @@ public class Configuration {
     public static final String KEY_CARD_HOLDER_NAME = "cardHolderName";
     public static final String KEY_CARD_EX_DATE = "cardExDate";
     public static final String KEY_PHONE_SERIAL_NO = "serialNo";
+    public static final String KEY_PHONE_BRAND ="phoneBrand";
+    public static final String KEY_PHONE_MODEL ="phoneModel";
     public static final String KEY_PURCHASER_ID = "purchaserId";
     //Local DataBase Tables And Keys
     public static final  String TABLE_PAYMENT_TRANSACTION_TABLE_NAME = "PaymentsTransaction";

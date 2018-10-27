@@ -9,7 +9,7 @@
         android:layout_height="208dp"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="18,100 SDG"
+        android:text="0,000 SDG"
         android:textColor="@android:color/white"
         android:textSize="34sp" />
 </LinearLayout>

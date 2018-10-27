@@ -11,10 +11,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 
@@ -39,6 +42,13 @@ public class PayFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         myView = inflater.inflate(R.layout.pay_fragment,container,false);
+        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) getActivity().findViewById(R.id.collapsing_toolbar_layout);
+        LinearLayout collapsingToolbarContent = (LinearLayout) getActivity().findViewById(R.id.collapsing_toolbar_content);
+        collapsingToolbarContent.setVisibility(View.GONE);
+        collapsingToolbarContent.removeAllViewsInLayout();
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        toolbar.setTitle("Map");
+        collapsingToolbarLayout.setTitle("Map");
         PackageManager pm = getActivity().getPackageManager();
         // Check whether NFC is available on device
         if (!pm.hasSystemFeature(PackageManager.FEATURE_NFC)) {

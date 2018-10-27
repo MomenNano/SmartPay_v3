@@ -1,9 +1,11 @@
 package com.android.nfc.smartpay_v3.Activities;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.nfc.NfcEvent;
 import android.os.Build;
 import android.provider.Settings;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Intent;
@@ -12,9 +14,11 @@ import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.nfc.smartpay_v3.Adapters.SlidePagerAdapter;
 import com.android.nfc.smartpay_v3.Classes.PaymentInfo;
 import com.android.nfc.smartpay_v3.DBA.Configuration;
 import com.android.nfc.smartpay_v3.R;
@@ -42,17 +46,40 @@ public class PayActivity extends AppCompatActivity implements NfcAdapter.CreateN
     boolean allGood = false;
     protected String externalType = "nfclab.com:SmartPay";
     PaymentInfo paymentInfo = new PaymentInfo();
+    SlidePagerAdapter slidePagerAdapter;
+    View collapseView;
+    ViewPager slidePager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_purchaser_main);
-
+        setContentView(R.layout.activity_pay);
+        slidePager = (ViewPager) findViewById(R.id.pay_view_pager);
+        SharedPreferences sharedPreferences = getSharedPreferences(Configuration.MY_PREFERENCE, Context.MODE_PRIVATE);
+        slidePagerAdapter = new SlidePagerAdapter(getBaseContext(),sharedPreferences);
+        slidePager.setAdapter(slidePagerAdapter);
+        slidePager.setOnPageChangeListener(viewPagerListener);
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         PurchaserMessage = (TextView) findViewById(R.id.PurchaserMessage);
 
     }
+    ViewPager.OnPageChangeListener viewPagerListener = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    };
 
     protected void checkNFCSupporting() {
         // Check whether NFC is available on device
@@ -165,11 +192,14 @@ public class PayActivity extends AppCompatActivity implements NfcAdapter.CreateN
         allGood = true;
 
         Gson gson = new Gson();
+        SharedPreferences sharedPreferences = getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
+
         paymentInfo = gson.fromJson(payload, PaymentInfo.class);
-
-        paymentInfo.setBillAmount(paymentInfo.getBillAmount());
-
-        paymentInfo.setDate(new Date());
+        paymentInfo.setCardId(sharedPreferences.getString(Configuration.KEY_CARD_NO,"null"));
+        paymentInfo.setPurchaserId(sharedPreferences.getString(Configuration.KEY_PURCHASER_ID,"null"));
+        paymentInfo.setFlag(0);
+        paymentInfo.setPurchaserName(sharedPreferences.getString(Configuration.KEY_PREFERENCE_USERNAME,"null"));
+        paymentInfo.setSendFlag(0);
         Log.d("create Message","createMessage");
 
         if (allGood) {

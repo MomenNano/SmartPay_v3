@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.android.nfc.smartpay_v3.Classes.Card;
 import com.android.nfc.smartpay_v3.ClassesManagers.CardInfoManager;
 import com.android.nfc.smartpay_v3.DBA.Configuration;
+import com.android.nfc.smartpay_v3.DBA.LocalDBA;
 import com.android.nfc.smartpay_v3.R;
 
 import java.util.ArrayList;
@@ -35,20 +36,24 @@ public class WalletFragment extends Fragment {
     View myView;
     CardsAdapter adapter;
     RecyclerView recyclerView;
+
     public int [] slideImage= {
-            R.drawable.fispngsmall,
-            R.drawable.omb,
-            R.drawable.bok
+            R.mipmap.fisal_bank,
+            R.mipmap.omb_card,
+            R.mipmap.bok_card
     };
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         myView = inflater.inflate(R.layout.wallet_fragment_layout,container,false);
         View collapseView = inflater.inflate(R.layout.wallet_collapse_layout,container,false);
+        TextView textView = collapseView.findViewById(R.id.wallet_balance);
+        textView.setText(String.valueOf(LocalDBA.getInstance(getActivity().getApplicationContext()).getWalletBalance())+" SDG");
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) getActivity().findViewById(R.id.collapsing_toolbar_layout);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         LinearLayout collapsingToolbarContent = (LinearLayout) getActivity().findViewById(R.id.collapsing_toolbar_content);
         collapsingToolbarContent.removeAllViewsInLayout();
+        collapsingToolbarContent.setVisibility(View.VISIBLE);
         collapsingToolbarContent.addView(collapseView,params);
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         toolbar.setTitle("My Wallet");

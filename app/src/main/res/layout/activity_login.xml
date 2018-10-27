@@ -37,7 +37,7 @@
                 android:layout_height="160dp"
                 android:layout_gravity="center_horizontal"
                 android:scaleType="centerCrop"
-                android:src="@drawable/logo2"
+                android:src="@mipmap/logo"
                 android:visibility="visible" />
 
             <LinearLayout

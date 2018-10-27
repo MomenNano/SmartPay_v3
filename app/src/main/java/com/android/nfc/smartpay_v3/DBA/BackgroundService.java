@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.android.nfc.smartpay_v3.Classes.PaymentInfo;
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -44,16 +45,17 @@ public class BackgroundService extends IntentService {
         /*for (int i = 0 ; i < 3 ; i++){
             PaymentInfo paymentInfo = new PaymentInfo();
             paymentInfo.setBillAmount("500");
-            paymentInfo.setUniqueId(Build.SERIAL);
-            paymentInfo.setCardId("123456789");
+            paymentInfo.setUniqueId("xxxxxxxxxxx"+i);
+            paymentInfo.setCardId("77");
             paymentInfo.setPurchaserId("9");
             paymentInfo.setCompanyId("1");
             paymentInfo.setPurchaserName("Mohamed Al-Ameen");
-            paymentInfo.setCompanyBankAccount("89798456231");
+            paymentInfo.setCompanyBankAccount("123456");
             paymentInfo.setCompanyType(2);
-            paymentInfo.setDate(new Date());
+            paymentInfo.setStringDate("12/10/2018");
+            paymentInfo.setStringTime("12:10:55");
             paymentInfo.setCompanyName("Area 51");
-            paymentInfo.setFlag(1);
+            paymentInfo.setFlag(0);
             LocalDBA.getInstance(getApplicationContext()).insertPaymentTransaction(paymentInfo);
         }*/
         Toast.makeText(getBaseContext(), "Service is Start"+servicesRun, Toast.LENGTH_LONG).show();
@@ -157,6 +159,7 @@ public class BackgroundService extends IntentService {
                 return params;
             }
         };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS*2,1,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         MySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
     }
     Response.ErrorListener errorListener = new Response.ErrorListener() {
@@ -205,6 +208,7 @@ public class BackgroundService extends IntentService {
                 return params;
             }
         };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS*2,1,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         MySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
     }
     Response.ErrorListener checkErrorListener = new Response.ErrorListener() {

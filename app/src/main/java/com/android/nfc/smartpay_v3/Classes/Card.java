@@ -14,6 +14,7 @@ public class Card {
     String exDate;
     String stringBankName;
     int cardId;
+    String password;
 
 
     public Card(String bankName, String cardNo, int cardIcon) {
@@ -96,5 +97,13 @@ public class Card {
 
     public void setExDate(String exDate) {
         this.exDate = exDate;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

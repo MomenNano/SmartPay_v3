@@ -1,0 +1,24 @@
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=55:59:0C:D1:91:53:50:F9:7E:20:AF:8E:99:78:44:DF:8A:38:FC:9A%3Bcom.android.nfc.smartpay_v3.Activities
+
+    You can also add your credentials to an existing key, using these values:
+
+    Package name:
+    55:59:0C:D1:91:53:50:F9:7E:20:AF:8E:99:78:44:DF:8A:38:FC:9A
+
+    SHA-1 certificate fingerprint:
+    55:59:0C:D1:91:53:50:F9:7E:20:AF:8E:99:78:44:DF:8A:38:FC:9A
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDf7xjLlGdFlQWEm57NwyqH9heevCGHkYE</string>
+</resources>

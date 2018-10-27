@@ -1,5 +1,7 @@
 package com.android.nfc.smartpay_v3.Activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.nfc.NfcEvent;
 import android.os.Build;
@@ -12,11 +14,15 @@ import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.nfc.smartpay_v3.Classes.PaymentInfo;
 import com.android.nfc.smartpay_v3.DBA.Configuration;
+import com.android.nfc.smartpay_v3.DBA.LocalDBA;
 import com.android.nfc.smartpay_v3.R;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -42,12 +48,18 @@ public class PurchaserMainActivity extends AppCompatActivity implements NfcAdapt
     boolean allGood = false;
     protected String externalType = "nfclab.com:SmartPay";
     PaymentInfo paymentInfo = new PaymentInfo();
+    AlertDialog alert;
+    LayoutInflater inflater;
+    View alertView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_purchaser_main);
-
+        alert = new AlertDialog.Builder(this).create();
+        alertView = View.inflate(getBaseContext(),R.layout.progress_dialog,null);
+        inflater = getLayoutInflater();
+        alert.setView(alertView);
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         PurchaserMessage = (TextView) findViewById(R.id.PurchaserMessage);
@@ -163,14 +175,15 @@ public class PurchaserMainActivity extends AppCompatActivity implements NfcAdapt
         String payload = new String(record.getPayload());
         PurchaserMessage.setText(payload);
         allGood = true;
-
         Gson gson = new Gson();
+        SharedPreferences sharedPreferences = getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
+
         paymentInfo = gson.fromJson(payload, PaymentInfo.class);
-
-        paymentInfo.setBillAmount(paymentInfo.getBillAmount());
-
-        paymentInfo.setDate(new Date());
-        Log.d("create Message","createMessage");
+        paymentInfo.setCardId(sharedPreferences.getString(Configuration.KEY_CARD_NO,"null"));
+        paymentInfo.setPurchaserId(sharedPreferences.getString(Configuration.KEY_PURCHASER_ID,"null"));
+        paymentInfo.setFlag(0);
+        paymentInfo.setPurchaserName(sharedPreferences.getString(Configuration.KEY_PREFERENCE_USERNAME,"null"));
+        paymentInfo.setSendFlag(0);
 
         if (allGood) {
             //NdefMessage ndefMessage = createNdefMessage();
@@ -179,6 +192,7 @@ public class PurchaserMainActivity extends AppCompatActivity implements NfcAdapt
         }
         nfcAdapter.setOnNdefPushCompleteCallback(this,this);
         Log.d("create Message","createMessage");
+
     }
 
     protected NdefMessage getNdefMessages(Intent intent) {
@@ -203,9 +217,8 @@ public class PurchaserMainActivity extends AppCompatActivity implements NfcAdapt
         Gson gson = new Gson();
 
         String msg = gson.toJson(paymentInfo);
-
+        showProgressBar(msg);
         //Send paymentInfo to the server
-        sendPurchasrePaymentInfo(msg);
         //Setup NdefRecord
         NdefRecord textRecord = new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, externalType.getBytes(), new byte[0], msg.getBytes());
         //Setup NdefMessage
@@ -219,9 +232,7 @@ public class PurchaserMainActivity extends AppCompatActivity implements NfcAdapt
     public void onNdefPushComplete(NfcEvent event) {
         System.out.print("LOL");
         Log.d("sent","sent successfully");
-
-
-
+        LocalDBA.getInstance(getApplicationContext()).insertPaymentTransaction(paymentInfo);
     }
 
     /*protected void sendToServer(){
@@ -266,4 +277,26 @@ public class PurchaserMainActivity extends AppCompatActivity implements NfcAdapt
         };
         requestQueue.add(stringRequest);
     }*/
+    public void showProgressBar(String str){
+        ProgressBar progressBar = alertView.findViewById(R.id.progressBar2);
+        progressBar.setVisibility(View.VISIBLE);
+        TextView msg = alertView.findViewById(R.id.progress_msg);
+        msg.setText(str);
+        alert.show();
+    }
+    public void dismissProgressBar(String str){
+        ProgressBar progressBar = alertView.findViewById(R.id.progressBar2);
+        progressBar.setVisibility(View.GONE);
+        TextView msg = alertView.findViewById(R.id.progress_msg);
+        msg.setText(str);
+        alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                alert.dismiss();
+            }
+        });
+    }
+    public void dismiss(){
+        alert.dismiss();
+    }
 }

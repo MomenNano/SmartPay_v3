@@ -9,14 +9,17 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 
@@ -35,6 +38,13 @@ public class HistoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         myView = inflater.inflate(R.layout.history_fragment, container, false);
+        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) getActivity().findViewById(R.id.collapsing_toolbar_layout);
+        LinearLayout collapsingToolbarContent = (LinearLayout) getActivity().findViewById(R.id.collapsing_toolbar_content);
+        collapsingToolbarContent.setVisibility(View.GONE);
+        collapsingToolbarContent.removeAllViewsInLayout();
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        toolbar.setTitle("Map");
+        collapsingToolbarLayout.setTitle("Map");
         recyclerView = (RecyclerView) myView.findViewById(R.id.history_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity().getBaseContext());
         recyclerView.setLayoutManager(layoutManager);

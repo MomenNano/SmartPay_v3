@@ -1,10 +1,14 @@
 package com.android.nfc.smartpay_v3.Fragments;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -14,6 +18,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,10 +59,23 @@ public class AddCardFragment extends Fragment {
     TextView tv_cardBankName;
     TextView tv_exDate;
     Spinner spinner;
+    EditText et_cardPassword;
+    AlertDialog alert;
+    View alertView;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         myView = inflater.inflate(R.layout.add_card_fragment,container,false);
+        alert = new AlertDialog.Builder(getActivity().getBaseContext()).create();
+        alertView = View.inflate(getActivity().getBaseContext(),R.layout.progress_dialog,null);
+        alert.setView(alertView);
+        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) getActivity().findViewById(R.id.collapsing_toolbar_layout);
+        LinearLayout collapsingToolbarContent = (LinearLayout) getActivity().findViewById(R.id.collapsing_toolbar_content);
+        collapsingToolbarContent.setVisibility(View.GONE);
+        collapsingToolbarContent.removeAllViewsInLayout();
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        toolbar.setTitle("Map");
+        collapsingToolbarLayout.setTitle("Map");
         tv_cardHolderName = (TextView) myView.findViewById(R.id.card_holder_name_tv);
         tv_cardNo = (TextView) myView.findViewById(R.id.card_number_tv);
         tv_exDate = (TextView) myView.findViewById(R.id.expire_date_tv);
@@ -64,6 +83,7 @@ public class AddCardFragment extends Fragment {
         final EditText et_cardHolderName = (EditText) myView.findViewById(R.id.card_holder_name_et);
         EditText et_cardNo = (EditText) myView.findViewById(R.id.card_number_et);
         EditText et_exDate = (EditText) myView.findViewById(R.id.expire_date_et);
+        et_cardPassword = (EditText) myView.findViewById(R.id.card_password_et);
 
         et_cardHolderName.addTextChangedListener(new TextWatcher() {
             boolean card_holder_name_boolean = false;
@@ -186,6 +206,7 @@ public class AddCardFragment extends Fragment {
         }
         String cardExDate = tv_exDate.getText().toString();
         String cardNo = tv_cardNo.getText().toString();
+        String cardPassword = et_cardPassword.getText().toString();
         if(cardHolderName.isEmpty() || cardBankName.isEmpty() || cardExDate.isEmpty() || cardNo.isEmpty() == false) {
             Log.d("Log:",cardHolderName+"||"+cardBankName+"||"+cardExDate+"||"+cardNo);
             Card card = new Card();
@@ -195,8 +216,9 @@ public class AddCardFragment extends Fragment {
             card.setStringBankName(dbName);
             card.setExDate(cardExDate);
             card.setCardIcon(spinner.getSelectedItemPosition());
+            card.setPassword(cardPassword);
             addCardToServer(card);
-
+            //showProgressBar("Validating The Card...");
         }
         else{
             Toast.makeText(getActivity().getBaseContext(),"Sorry you need to fill all the field first",Toast.LENGTH_SHORT).show();
@@ -214,15 +236,19 @@ public class AddCardFragment extends Fragment {
                                 LocalDBA localDBA = new LocalDBA(getActivity().getBaseContext());
                                 localDBA.insertCard(card);
                                 Toast.makeText(getActivity().getBaseContext(), jsonObject.getString(Configuration.KEY_MESSAGE), Toast.LENGTH_SHORT).show();
+                                //dismissProgressBar(jsonObject.getString(Configuration.KEY_MESSAGE));
                             }
                             else if (jsonObject.getString(Configuration.CODE).compareTo("0") == 0){
                                 Toast.makeText(getActivity().getBaseContext(),jsonObject.getString(Configuration.KEY_MESSAGE), Toast.LENGTH_SHORT).show();
+                                //dismissProgressBar(jsonObject.getString(Configuration.KEY_MESSAGE));
                             }
-                            else if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("expired") == 0){
+                            else if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("2") == 0){
                                 Toast.makeText(getActivity().getBaseContext(),jsonObject.getString(Configuration.KEY_MESSAGE), Toast.LENGTH_SHORT).show();
+                                //dismissProgressBar(jsonObject.getString(Configuration.KEY_MESSAGE));
                             }
                             else {
                                 Toast.makeText(getActivity().getBaseContext(), "Check Your Internet Connection And Try Again", Toast.LENGTH_SHORT).show();
+                                //dismissProgressBar("Check Your Internet Connection And Try Again");
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -233,6 +259,7 @@ public class AddCardFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(getActivity().getBaseContext(), "Something went wrong try again", Toast.LENGTH_SHORT).show();
+                //dismissProgressBar("Check Your Internet Connection And Try Again");
             }
 
         })
@@ -247,6 +274,7 @@ public class AddCardFragment extends Fragment {
                 parms.put(Configuration.KEY_CARD_EX_DATE,card.getExDate());
                 parms.put(Configuration.KEY_PHONE_SERIAL_NO,sharedPreferences.getString(Configuration.KEY_PHONE_SERIAL_NO,""));
                 parms.put(Configuration.KEY_PURCHASER_ID,sharedPreferences.getString(Configuration.KEY_PREFERENCE_USER_ID,""));
+                parms.put(Configuration.KEY_PASSWORD,card.getPassword());
                 return parms;
             }
         };
@@ -256,5 +284,24 @@ public class AddCardFragment extends Fragment {
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         MySingleton.getInstance(getActivity().getApplicationContext()).addToRequestQueue(stringRequest);
 
+    }
+    public void showProgressBar(String str){
+        ProgressBar progressBar = alertView.findViewById(R.id.progressBar2);
+        progressBar.setVisibility(View.VISIBLE);
+        TextView msg = alertView.findViewById(R.id.progress_msg);
+        msg.setText(str);
+        alert.show();
+    }
+    public void dismissProgressBar(String str){
+        ProgressBar progressBar = alertView.findViewById(R.id.progressBar2);
+        progressBar.setVisibility(View.GONE);
+        TextView msg = alertView.findViewById(R.id.progress_msg);
+        msg.setText(str);
+        alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                alert.dismiss();
+            }
+        });
     }
 }

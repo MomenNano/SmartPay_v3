@@ -104,8 +104,8 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_pay) {
             fragmentManager.beginTransaction().replace(R.id.content_frame, new PayFragment()).commit();
-            Intent intent = new Intent(getBaseContext(),PurchaserMainActivity.class);
-            startActivity(intent);
+            /*Intent intent = new Intent(getBaseContext(),PurchaserMainActivity.class);
+            startActivity(intent);*/
         } else if (id == R.id.nav_map) {
         fragmentManager.beginTransaction().replace(R.id.content_frame, new MapFragment()).commit();
 

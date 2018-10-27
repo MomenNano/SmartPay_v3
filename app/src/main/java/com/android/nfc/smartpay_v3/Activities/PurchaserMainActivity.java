@@ -217,7 +217,7 @@ public class PurchaserMainActivity extends AppCompatActivity implements NfcAdapt
         Gson gson = new Gson();
 
         String msg = gson.toJson(paymentInfo);
-        showProgressBar(msg);
+        //showProgressBar(msg);
         //Send paymentInfo to the server
         //Setup NdefRecord
         NdefRecord textRecord = new NdefRecord(NdefRecord.TNF_EXTERNAL_TYPE, externalType.getBytes(), new byte[0], msg.getBytes());

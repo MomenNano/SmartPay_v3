@@ -66,8 +66,8 @@ public class AddCardFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         myView = inflater.inflate(R.layout.add_card_fragment,container,false);
-        alert = new AlertDialog.Builder(getActivity().getBaseContext()).create();
-        alertView = View.inflate(getActivity().getBaseContext(),R.layout.progress_dialog,null);
+        alert = new AlertDialog.Builder(getActivity()).create();
+        alertView = inflater.inflate(R.layout.progress_dialog,container,false);
         alert.setView(alertView);
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) getActivity().findViewById(R.id.collapsing_toolbar_layout);
         LinearLayout collapsingToolbarContent = (LinearLayout) getActivity().findViewById(R.id.collapsing_toolbar_content);
@@ -218,7 +218,6 @@ public class AddCardFragment extends Fragment {
             card.setCardIcon(spinner.getSelectedItemPosition());
             card.setPassword(cardPassword);
             addCardToServer(card);
-            //showProgressBar("Validating The Card...");
         }
         else{
             Toast.makeText(getActivity().getBaseContext(),"Sorry you need to fill all the field first",Toast.LENGTH_SHORT).show();
@@ -233,22 +232,24 @@ public class AddCardFragment extends Fragment {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             if (jsonObject.getString(Configuration.CODE).compareTo("1") == 0){
+                                card.setCardNo(jsonObject.getString(Configuration.KEY_CARD_NO));
                                 LocalDBA localDBA = new LocalDBA(getActivity().getBaseContext());
                                 localDBA.insertCard(card);
                                 Toast.makeText(getActivity().getBaseContext(), jsonObject.getString(Configuration.KEY_MESSAGE), Toast.LENGTH_SHORT).show();
-                                //dismissProgressBar(jsonObject.getString(Configuration.KEY_MESSAGE));
+                                dismissProgressBar(jsonObject.getString(Configuration.KEY_MESSAGE));
+                                dismiss();
                             }
                             else if (jsonObject.getString(Configuration.CODE).compareTo("0") == 0){
                                 Toast.makeText(getActivity().getBaseContext(),jsonObject.getString(Configuration.KEY_MESSAGE), Toast.LENGTH_SHORT).show();
-                                //dismissProgressBar(jsonObject.getString(Configuration.KEY_MESSAGE));
+                                dismissProgressBar(jsonObject.getString(Configuration.KEY_MESSAGE));
                             }
                             else if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("2") == 0){
                                 Toast.makeText(getActivity().getBaseContext(),jsonObject.getString(Configuration.KEY_MESSAGE), Toast.LENGTH_SHORT).show();
-                                //dismissProgressBar(jsonObject.getString(Configuration.KEY_MESSAGE));
+                                dismissProgressBar(jsonObject.getString(Configuration.KEY_MESSAGE));
                             }
                             else {
                                 Toast.makeText(getActivity().getBaseContext(), "Check Your Internet Connection And Try Again", Toast.LENGTH_SHORT).show();
-                                //dismissProgressBar("Check Your Internet Connection And Try Again");
+                                dismissProgressBar("Something Went Wrong");
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -259,7 +260,7 @@ public class AddCardFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(getActivity().getBaseContext(), "Something went wrong try again", Toast.LENGTH_SHORT).show();
-                //dismissProgressBar("Check Your Internet Connection And Try Again");
+                dismissProgressBar("Check Your Internet Connection And Try Again");
             }
 
         })
@@ -273,7 +274,7 @@ public class AddCardFragment extends Fragment {
                 parms.put(Configuration.KEY_CARD_HOLDER_NAME,card.getCardHolderName());
                 parms.put(Configuration.KEY_CARD_EX_DATE,card.getExDate());
                 parms.put(Configuration.KEY_PHONE_SERIAL_NO,sharedPreferences.getString(Configuration.KEY_PHONE_SERIAL_NO,""));
-                parms.put(Configuration.KEY_PURCHASER_ID,sharedPreferences.getString(Configuration.KEY_PREFERENCE_USER_ID,""));
+                parms.put(Configuration.KEY_PURCHASER_ID,sharedPreferences.getString(Configuration.KEY_PURCHASER_ID,""));
                 parms.put(Configuration.KEY_PASSWORD,card.getPassword());
                 return parms;
             }
@@ -283,7 +284,7 @@ public class AddCardFragment extends Fragment {
                 0,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         MySingleton.getInstance(getActivity().getApplicationContext()).addToRequestQueue(stringRequest);
-
+        showProgressBar("Validating The Card...");
     }
     public void showProgressBar(String str){
         ProgressBar progressBar = alertView.findViewById(R.id.progressBar2);
@@ -304,4 +305,8 @@ public class AddCardFragment extends Fragment {
             }
         });
     }
+    public void dismiss(){
+        alert.dismiss();
+    }
+
 }

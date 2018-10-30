@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 
 
 import com.android.nfc.smartpay_v3.Classes.Card;
@@ -20,10 +21,12 @@ public class LocalDBA extends SQLiteOpenHelper  {
 
     private static final  String DATABASE_NAME = "smartpay.db";
     private static final  String CARDS_TABLE_NAME = "Cards";
-    private static final  String CARDS_COLUMN_CARDNO = "c_id";
+    private static final  String CARDS_COLUMN_CARD_ID = "c_id";
+    private static final  String CARDS_COLUMN_CARD_NO = "c_no";
     private static final  String CARDS_COLUMN_BANK_NAME = "c_bank";
     private static final  String CARDS_COLUMN_HOLDER_NAME = "c_holder_name";
     private static final  String CARDS_COLUMN_BALANCE = "c_balance";
+    private static final  String CARDS_COLUMN_PASSWORD = "c_password";
     private static final  String CARDS_COLUMN_ICON = "c_icon";
     private static final  String CARDS_COLUMN_FLAG = "c_flag";
     private static final  String PAYMENT_TRANSACTION_TABLE_NAME = "PaymentsTransaction";
@@ -53,7 +56,7 @@ public class LocalDBA extends SQLiteOpenHelper  {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("create Table Cards"
-                +"(c_id text primary key , c_bank text , c_holder_name text , c_balance real ,c_icon integer , c_flag integer)");
+                +"(c_id Integer primary key AUTOINCREMENT , c_no text , c_bank text , c_holder_name text , c_balance real , c_password text, c_icon integer , c_flag integer)");
         db.execSQL("create Table PaymentsTransaction"
                 +"(p_id integer primary key AUTOINCREMENT ,p_unique_id , p_bill_Amount real , p_payment_date text , p_time text ,p_company_bank_account integer,p_company_id integer," +
                 " p_company_type integer, p_company_name text,p_purchaser_id text,p_purchaser_name text,p_purchaser_card_id text,p_flag integer,p_send integer)");
@@ -103,12 +106,44 @@ public class LocalDBA extends SQLiteOpenHelper  {
                 ,new String[]{Integer.toString(id)});
         return true;
     }
+    public boolean updatePaymentTransactionUniqueID(int id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Configuration.TABLE_PAYMENT_TRANSACTION_UNIQUE_ID,Build.SERIAL+id);
+        db.update(Configuration.TABLE_PAYMENT_TRANSACTION_TABLE_NAME,contentValues
+                ,Configuration.TABLE_PAYMENT_TRANSACTION_ID+"= ?"
+                ,new String[]{Integer.toString(id)});
+        return true;
+    }
 
 
     public ArrayList<PaymentInfo> getAllPaymentTransaction(){
         ArrayList<PaymentInfo> paymentInfoArrayList = new ArrayList<PaymentInfo>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor result = db.rawQuery("Select * from PaymentsTransaction",null);
+        result.moveToFirst();
+        while (result.isAfterLast() == false){
+            PaymentInfo paymentInfo = new PaymentInfo();
+            paymentInfo.setTransactionId(result.getString(result.getColumnIndex(Configuration.TABLE_PAYMENT_TRANSACTION_ID)));
+            paymentInfo.setUniqueId(result.getString(result.getColumnIndex(Configuration.TABLE_PAYMENT_TRANSACTION_UNIQUE_ID)));
+            paymentInfo.setBillAmount(result.getString(result.getColumnIndex(Configuration.TABLE_PAYMENT_TRANSACTION_BILL_AMOUNT)));
+            paymentInfo.setCompanyId(result.getString(result.getColumnIndex(Configuration.TABLE_PAYMENT_TRANSACTION_COMPANY_ID)));
+            paymentInfo.setCompanyName(result.getString(result.getColumnIndex(Configuration.TABLE_PAYMENT_TRANSACTION_COMPANY_NAME)));
+            paymentInfo.setCompanyType(result.getInt(result.getColumnIndex(Configuration.TABLE_PAYMENT_TRANSACTION_COMPANY_TYPE)));
+            paymentInfo.setStringDate(result.getString(result.getColumnIndex(Configuration.TABLE_PAYMENT_TRANSACTION_DATE)));
+            paymentInfo.setStringTime(result.getString(result.getColumnIndex(Configuration.TABLE_PAYMENT_TRANSACTION_TIME)));
+            paymentInfo.setPurchaserName(result.getString(result.getColumnIndex(Configuration.TABLE_PAYMENT_TRANSACTION_PURCHASER_NAME)));
+            paymentInfo.setCardId(result.getString(result.getColumnIndex(Configuration.TABLE_PAYMENT_TRANSACTION_PURCHASER_CARD_ID)));
+            paymentInfo.setFlag(Integer.valueOf(result.getString(result.getColumnIndex(Configuration.TABLE_PAYMENT_TRANSACTION_FLAG))));
+            paymentInfoArrayList.add(paymentInfo);
+            result.moveToNext();
+        }
+        return paymentInfoArrayList;
+    }
+    public ArrayList<PaymentInfo> getCardPaymentTransaction(int cardid){
+        ArrayList<PaymentInfo> paymentInfoArrayList = new ArrayList<PaymentInfo>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor result = db.rawQuery("Select * from PaymentsTransaction Where p_purchaser_card_id="+cardid,null);
         result.moveToFirst();
         while (result.isAfterLast() == false){
             PaymentInfo paymentInfo = new PaymentInfo();
@@ -191,10 +226,11 @@ public class LocalDBA extends SQLiteOpenHelper  {
     public boolean insertCard(Card card){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put("c_id",card.getCardNo());
+        contentValues.put("c_no",card.getCardNo());
         contentValues.put("c_bank",card.getBankName());
         contentValues.put("c_holder_name",card.getCardHolderName());
         contentValues.put("c_balance",card.getCardBalance());
+        contentValues.put("c_password",card.getPassword());
         contentValues.put("c_icon",card.getCardIcon());
         contentValues.put("c_flag",card.getCardFlag());
         db.insert("Cards",null,contentValues);
@@ -208,12 +244,14 @@ public class LocalDBA extends SQLiteOpenHelper  {
         result.moveToFirst();
         while (result.isAfterLast() == false){
             Card card = new Card();
-            card.setCardNo(result.getString(result.getColumnIndex(CARDS_COLUMN_CARDNO)));
+            card.setCardId(Integer.valueOf(result.getString(result.getColumnIndex(CARDS_COLUMN_CARD_ID))));
+            card.setCardNo(result.getString(result.getColumnIndex(CARDS_COLUMN_CARD_NO)));
             card.setBankName(result.getString(result.getColumnIndex(CARDS_COLUMN_BANK_NAME)));
             card.setCardBalance(result.getDouble(result.getColumnIndex(CARDS_COLUMN_BALANCE)));
             card.setCardHolderName(result.getString(result.getColumnIndex(CARDS_COLUMN_HOLDER_NAME)));
             card.setCardIcon(result.getInt(result.getColumnIndex(CARDS_COLUMN_ICON)));
             card.setCardFlag(result.getInt(result.getColumnIndex(CARDS_COLUMN_FLAG)));
+            card.setPassword(result.getString(result.getColumnIndex(CARDS_COLUMN_PASSWORD)));
             cardArrayList.add(card);
             result.moveToNext();
         }
@@ -230,23 +268,23 @@ public class LocalDBA extends SQLiteOpenHelper  {
         }
         return balance;
     }
-    public boolean updateBalance(double balance,String cardNo){
+    public boolean updateBalance(double balance,int cardid){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(CARDS_COLUMN_BALANCE,balance);
-        db.update(CARDS_TABLE_NAME,contentValues,CARDS_COLUMN_CARDNO+"="+cardNo,null);
+        db.update(CARDS_TABLE_NAME,contentValues,CARDS_COLUMN_CARD_ID+"="+String.valueOf(cardid),null);
         return true;
     }
-    public boolean withdrawBalance(double balance,String cardNo){
+    public boolean withdrawBalance(double balance,int cardid){
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor result = db.rawQuery("Select * from "+CARDS_TABLE_NAME+"where"+CARDS_COLUMN_CARDNO+"="+cardNo,null);
+        Cursor result = db.rawQuery("Select * from "+CARDS_TABLE_NAME+"where"+CARDS_COLUMN_CARD_ID+"="+cardid,null);
         result.moveToFirst();
         while (result.isAfterLast() == false) {
             Card card = new Card();
             card.setCardBalance(Double.valueOf(result.getString(result.getColumnIndex(CARDS_COLUMN_BALANCE))));
             ContentValues contentValues = new ContentValues();
             contentValues.put(CARDS_COLUMN_BALANCE, card.getCardBalance()-balance);
-            db.update(CARDS_TABLE_NAME, contentValues, CARDS_COLUMN_CARDNO + "=" + cardNo, null);
+            db.update(CARDS_TABLE_NAME, contentValues, CARDS_COLUMN_CARD_ID + "=" + cardid, null);
             return true;
         }
         return false;

@@ -36,8 +36,9 @@
                 android:layout_width="160dp"
                 android:layout_height="160dp"
                 android:layout_gravity="center_horizontal"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/logo"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/logo_icon"
                 android:visibility="visible" />
 
             <LinearLayout
@@ -219,7 +220,7 @@
                     android:layout_margin="10dp"
                     android:background="@drawable/et_cont"
                     android:ems="10"
-                    android:inputType="textPersonName"
+                    android:inputType="textPassword"
                     android:outlineProvider="bounds"
                     android:padding="10dp"
                     android:textColor="@color/mainTextColor2" />
@@ -243,7 +244,7 @@
                     android:layout_margin="10dp"
                     android:background="@drawable/et_cont"
                     android:ems="10"
-                    android:inputType="textPersonName"
+                    android:inputType="textPassword"
                     android:outlineProvider="bounds"
                     android:padding="10dp"
                     android:textColor="@color/mainTextColor2" />

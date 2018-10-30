@@ -22,15 +22,14 @@
         android:weightSum="1">
 
         <ImageView
-            android:id="@+id/imageView4"
+            android:id="@+id/success_icon"
             android:layout_width="153dp"
             android:layout_height="120dp"
             android:layout_weight="0.14"
-            android:background="@drawable/sucess_icon_cont"
-            app:srcCompat="@mipmap/success_icon" />
+            />
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/success_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-condensed"
@@ -41,7 +40,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/textView13"
+            android:id="@+id/sucess_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-condensed"
@@ -137,7 +136,8 @@
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@mipmap/coffee_icon" />
+                android:src="@mipmap/cafe_icon_round"
+                app:srcCompat="@mipmap/cafe_icon_round" />
 
             <TextView
                 android:id="@+id/seller_name"

@@ -17,6 +17,7 @@ public class SplashScreen extends Activity {
     Runnable runnable = new Runnable() {
         @Override
         public void run() {
+            finish();
             Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
             startActivity(intent);
         }

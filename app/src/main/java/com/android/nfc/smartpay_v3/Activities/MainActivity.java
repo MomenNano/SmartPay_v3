@@ -104,8 +104,8 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_pay) {
             fragmentManager.beginTransaction().replace(R.id.content_frame, new PayFragment()).commit();
-            /*Intent intent = new Intent(getBaseContext(),PurchaserMainActivity.class);
-            startActivity(intent);*/
+            Intent intent = new Intent(getBaseContext(),PurchaserMainActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_map) {
         fragmentManager.beginTransaction().replace(R.id.content_frame, new MapFragment()).commit();
 
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity
             SharedPreferences sharedPreferences = getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.clear();
-            editor.commit();
+            editor.apply();
             Intent intent = new Intent(getBaseContext(),LoginActivity.class);
             startActivity(intent);
         }

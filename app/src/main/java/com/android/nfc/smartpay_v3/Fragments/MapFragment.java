@@ -69,9 +69,10 @@ public class MapFragment extends Fragment implements
     View collapseView;
 
     public int [] companeyImage= {
-            R.mipmap.coffee_icon,
-            R.mipmap.coffee_icon,
-            R.mipmap.coffee_icon
+            R.mipmap.cafe_icon,
+            R.mipmap.resturant_icon,
+            R.mipmap.game_icon,
+            R.mipmap.supermarket
     };
 
     @Override

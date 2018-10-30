@@ -73,7 +73,6 @@ public class LoginActivity extends Activity {
         setContentView(R.layout.activity_login);
         alert = new AlertDialog.Builder(this).create();
         alertView = View.inflate(getBaseContext(),R.layout.progress_dialog,null);
-        inflater = getLayoutInflater();
         alert.setView(alertView);
         loginLayout = (LinearLayout) findViewById(R.id.login_Layout);
         registerLayout = (LinearLayout) findViewById(R.id.register_layout);
@@ -101,19 +100,12 @@ public class LoginActivity extends Activity {
         handler.postDelayed(runnable, 1000);
 
 
-        /*LocalDBA localDBA = new LocalDBA(this);
-        Cursor result =localDBA.autoLogin();
-        if(result!=null){
-            DBA dba = new DBA();
-            dba.updateData();
-            Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-            startActivity(intent);
-        }*/
-//        SharedPreferences sharedPreferences = getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
-//        if(sharedPreferences != null && sharedPreferences.getString(Configuration.KEY_PREFERENCE_USERNAME,null) != null){
-//            Intent intent = new Intent(getBaseContext(),MainActivity.class);
-//            startActivity(intent);
-//        }
+
+        SharedPreferences sharedPreferences = getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
+       if(sharedPreferences != null && sharedPreferences.getString(Configuration.KEY_PREFERENCE_USERNAME,null) != null){
+           Intent intent = new Intent(getBaseContext(),MainActivity.class);
+           startActivity(intent);
+        }
 
     }
 
@@ -121,8 +113,6 @@ public class LoginActivity extends Activity {
          l_username = (EditText) findViewById(R.id.login_username);
          l_password = (EditText) findViewById(R.id.login_password);
 
-        /*Intent intent = new Intent(getBaseContext(),MainActivity.class);
-        startActivity(intent);*/
          RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
 
          final StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST,myurl,
@@ -141,6 +131,7 @@ public class LoginActivity extends Activity {
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putString(Configuration.KEY_PREFERENCE_USERNAME,l_username.getText().toString());
                                 editor.putString(Configuration.KEY_PURCHASER_ID,id);
+                                editor.putString(Configuration.KEY_PHONE_SERIAL_NO,Build.SERIAL);
                                 editor.apply();
                                 Toast.makeText(getBaseContext(),"Login Successfully",Toast.LENGTH_LONG).show();
                                 dismiss();
@@ -190,45 +181,56 @@ public class LoginActivity extends Activity {
         r_password = findViewById(R.id.r_password);
         r_confirm_password = findViewById(R.id.r_confirm_password);
         r_user_phone_no = findViewById(R.id.r_user_phone_no);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, Configuration.REGISTER_URL,
-                new Response.Listener<String>() {
+        if (!r_username.getText().toString().isEmpty() && !r_password.getText().toString().isEmpty()
+                && !r_confirm_password.getText().toString().isEmpty() && !r_user_phone_no.getText().toString().isEmpty() ) {
+            if (r_password.getText().toString().compareTo(r_confirm_password.getText().toString()) == 0) {
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, Configuration.REGISTER_URL,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                try {
+                                    JSONObject jsonObject = new JSONObject(response);
+                                    if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("successfully") == 0) {
+                                        openSession(r_username.getText().toString(), jsonObject.getString(Configuration.KEY_USER_ID));
+                                        dismiss();
+                                    } else if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("failed") == 0) {
+                                        Toast.makeText(getBaseContext(), jsonObject.getString(Configuration.KEY_MESSAGE), Toast.LENGTH_SHORT).show();
+                                        dismissProgressBar(jsonObject.getString(Configuration.KEY_MESSAGE));
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }, new Response.ErrorListener() {
                     @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("successfully") == 0){
-                                openSession(r_username.getText().toString(),jsonObject.getString(Configuration.KEY_USER_ID));
-                                dismiss();
-                            }
-                            else if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("failed") == 0){
-                                Toast.makeText(getBaseContext(), jsonObject.getString(Configuration.KEY_MESSAGE), Toast.LENGTH_SHORT).show();
-                                dismissProgressBar(jsonObject.getString(Configuration.KEY_MESSAGE));
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getBaseContext(), "Something went wrong try again", Toast.LENGTH_SHORT).show();
+                        dismissProgressBar("Something went wrong try again");
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getBaseContext(), "Something went wrong try again", Toast.LENGTH_SHORT).show();
-                dismissProgressBar("Something went wrong try again");
-            }
 
-        })
-        {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> parms = new HashMap<>();
-                parms.put(Configuration.kEY_USERNAME,r_username.getText().toString());
-                parms.put(Configuration.KEY_PASSWORD,r_password.getText().toString());
-                parms.put(Configuration.KEY_PHONE_NO,r_user_phone_no.getText().toString());
-                return parms;
+                }) {
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String> parms = new HashMap<>();
+                        parms.put(Configuration.kEY_USERNAME, r_username.getText().toString());
+                        parms.put(Configuration.KEY_PASSWORD, r_password.getText().toString());
+                        parms.put(Configuration.KEY_PHONE_NO, r_user_phone_no.getText().toString());
+                        return parms;
+                    }
+                };
+                MySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
+                showProgressBar("Registering...");
             }
-        };
-        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
-        showProgressBar("Registering...");
+            else {
+                showProgressBar("Registering...");
+                dismissProgressBar("Password and confirm password are not the same");
+            }
+        }
+        else {
+            showProgressBar("Registering...");
+            dismissProgressBar("Fill all field");
+        }
     }
     public void openSession(String username,String userID){
         SharedPreferences sharedPreferences = getSharedPreferences(MY_PREFERENCE,MODE_PRIVATE);

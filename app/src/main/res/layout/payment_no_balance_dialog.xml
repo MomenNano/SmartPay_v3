@@ -25,9 +25,7 @@
             android:id="@+id/imageView4"
             android:layout_width="153dp"
             android:layout_height="120dp"
-            android:layout_weight="0.14"
-            android:background="@drawable/sucess_icon_cont"
-            app:srcCompat="@mipmap/failed_icon" />
+            android:layout_weight="0.14" />
 
         <TextView
             android:id="@+id/textView4"

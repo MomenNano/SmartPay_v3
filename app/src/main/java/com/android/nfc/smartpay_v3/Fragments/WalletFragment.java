@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 
 import com.android.nfc.smartpay_v3.Classes.Card;
+import com.android.nfc.smartpay_v3.Classes.PaymentInfo;
 import com.android.nfc.smartpay_v3.ClassesManagers.CardInfoManager;
 import com.android.nfc.smartpay_v3.DBA.Configuration;
 import com.android.nfc.smartpay_v3.DBA.LocalDBA;
@@ -67,6 +68,8 @@ public class WalletFragment extends Fragment {
 
     }
 
+
+
     public class CardsAdapter extends Adapter<CardsAdapter.CardHolder>{
         private List<Card> cardsList;
         public class CardHolder extends RecyclerView.ViewHolder {
@@ -98,7 +101,7 @@ public class WalletFragment extends Fragment {
         public void onBindViewHolder(CardHolder holder, int position) {
             holder.card = cardsList.get(position);
             holder.cardBankName.setText(holder.card.getBankName());
-            holder.cardNo.setText("xxxx xxxx xxxx - "+holder.card.getCardNo());
+            holder.cardNo.setText("xxxx xxxx xxxx - "+holder.card.getCardId());
             holder.cardIcon.setImageResource(slideImage[holder.card.getCardIcon()]);
 
         }
@@ -107,7 +110,14 @@ public class WalletFragment extends Fragment {
         public int getItemCount() {
             return this.cardsList.size();
         }
-
+        public void swap(ArrayList<Card> newList) {
+            if(newList == null || newList.size()==0)
+                return;
+            if (cardsList != null && cardsList.size()>0)
+                cardsList.clear();
+            cardsList.addAll(newList);
+            notifyDataSetChanged();
+        }
     }
     public void UpdateUI(){
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Configuration.MY_PREFERENCE, Context.MODE_PRIVATE);
@@ -119,9 +129,10 @@ public class WalletFragment extends Fragment {
             CardsAdapter cAdapter = new CardsAdapter(cardArrayList);
             adapter = cAdapter;
             this.recyclerView.setAdapter(adapter);
+            this.adapter.notifyDataSetChanged();
             return;
         }
-
+        this.adapter.swap(cardArrayList);
         this.adapter.notifyDataSetChanged();
     }
 

@@ -41,9 +41,13 @@ public class SlidePagerAdapter extends PagerAdapter {
     ArrayList<Card> cardArrayList;
     Context context;
     SharedPreferences sharedPreferences;
-    public SlidePagerAdapter(Context context, SharedPreferences sharedPreferences){
+    boolean horizental = true;
+    boolean vertical = false;
+    public SlidePagerAdapter(Context context, SharedPreferences sharedPreferences, boolean v, boolean h){
         this.context = context;
         this.sharedPreferences = sharedPreferences;
+        vertical = v;
+        horizental = h;
         localDBA = new LocalDBA(context);
         cardArrayList = localDBA.getAllCards();
         if (cardArrayList.isEmpty()){
@@ -55,9 +59,14 @@ public class SlidePagerAdapter extends PagerAdapter {
     }
 
     public int [] slideImage= {
-            R.drawable.fispngsmall,
-            R.drawable.omb,
-            R.drawable.bok
+            R.drawable.fis_horizental,
+            R.drawable.omb_horizental,
+            R.drawable.bok_horizental
+    };
+    public int [] slideVerticalImage= {
+            R.drawable.fis_vertical,
+            R.drawable.omb_vertical,
+            R.drawable.bok_vertical
     };
 
     @Override
@@ -77,7 +86,12 @@ public class SlidePagerAdapter extends PagerAdapter {
         View view = layoutInflater.inflate(R.layout.slide_layout,container,false);
         ImageView slideIcon = (ImageView) view.findViewById(R.id.slider_latout_card_image);
         TextView cardBalance = (TextView) view .findViewById(R.id.card_balance);
-        slideIcon.setImageResource(slideImage[cardArrayList.get(position).getCardIcon()]);
+        if (horizental) {
+            slideIcon.setImageResource(slideImage[cardArrayList.get(position).getCardIcon()]);
+        }
+        else if (vertical){
+            slideIcon.setImageResource(slideVerticalImage[cardArrayList.get(position).getCardIcon()]);
+        }
         SharedPreferences sharedPreferences = context.getSharedPreferences(Configuration.MY_PREFERENCE,Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(Configuration.KEY_CARD_NO,cardArrayList.get(position).getCardNo());

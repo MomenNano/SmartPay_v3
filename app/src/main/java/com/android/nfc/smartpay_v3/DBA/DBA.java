@@ -28,9 +28,9 @@ import java.util.Map;
 
 public class DBA {
     public int [] cardsbankImage= {
-            R.drawable.fispngsmall,
-            R.drawable.omb,
-            R.drawable.bok
+            R.drawable.fis_horizental,
+            R.drawable.omb_horizental,
+            R.drawable.bok_horizental
     };
     public String [] cardBanksName = {
             "Fisal Islamic Bank",

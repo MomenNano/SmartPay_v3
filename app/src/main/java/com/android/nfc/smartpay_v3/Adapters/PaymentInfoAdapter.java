@@ -69,8 +69,14 @@ public class PaymentInfoAdapter extends RecyclerView.Adapter<PaymentInfoAdapter.
             holder.stateBtn.setBackgroundResource(R.drawable.state_false);
             holder.stateBtn.setText("Not Completed");
         }
-            if(holder.paymentObj.getCompanyType()==1)
-            holder.companeyIcon.setImageResource(R.mipmap.coffee_icon);
+            if(holder.paymentObj.getCompanyType()==0)
+                holder.companeyIcon.setImageResource(R.mipmap.cafe_icon);
+            else if (holder.paymentObj.getCompanyType()==1)
+                holder.companeyIcon.setImageResource(R.mipmap.resturant_icon);
+            else if (holder.paymentObj.getCompanyType()==2)
+                holder.companeyIcon.setImageResource(R.mipmap.game_icon);
+            else if (holder.paymentObj.getCompanyType()==3)
+                holder.companeyIcon.setImageResource(R.mipmap.supermarket);
 
     }
 

@@ -90,6 +90,7 @@ public class BackgroundService extends IntentService {
                 paymentInfoArrayList = LocalDBA.getInstance(getApplicationContext()).getNonResponsePaymentTransaction();
                 for (int i = 0; i < paymentInfoArrayList.size(); i++) {
                     PaymentInfo paymentInfo = paymentInfoArrayList.get(i);
+                    LocalDBA.getInstance(getApplicationContext()).updatePaymentTransactionUniqueID(Integer.valueOf(paymentInfo.getTransactionId()));
                     System.out.println("Payment Send Flag"+paymentInfo.getSendFlag());
                     if (!paymentInfoArrayList.isEmpty()){
                         checkPaymentInfoInServer(paymentInfo);
@@ -159,7 +160,10 @@ public class BackgroundService extends IntentService {
                 return params;
             }
         };
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS*2,1,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                DefaultRetryPolicy.DEFAULT_TIMEOUT_MS*2,
+                1,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         MySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
     }
     Response.ErrorListener errorListener = new Response.ErrorListener() {
@@ -208,7 +212,10 @@ public class BackgroundService extends IntentService {
                 return params;
             }
         };
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS*2,1,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy
+                (DefaultRetryPolicy.DEFAULT_TIMEOUT_MS*2,
+                        1,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         MySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
     }
     Response.ErrorListener checkErrorListener = new Response.ErrorListener() {

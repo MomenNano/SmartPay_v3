@@ -190,12 +190,17 @@ public class LoginActivity extends Activity {
                             public void onResponse(String response) {
                                 try {
                                     JSONObject jsonObject = new JSONObject(response);
-                                    if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("successfully") == 0) {
-                                        openSession(r_username.getText().toString(), jsonObject.getString(Configuration.KEY_USER_ID));
+                                    if (jsonObject.getString(Configuration.CODE).compareTo("1") == 0) {
+                                        dismissProgressBar(jsonObject.getString(Configuration.MESSAGE));
                                         dismiss();
-                                    } else if (jsonObject.getString(Configuration.KEY_RESULT).compareTo("failed") == 0) {
+                                        openSession(r_username.getText().toString(), jsonObject.getString(Configuration.KEY_PURCHASER_ID));
+
+                                    } else if (jsonObject.getString(Configuration.CODE).compareTo("0") == 0) {
                                         Toast.makeText(getBaseContext(), jsonObject.getString(Configuration.KEY_MESSAGE), Toast.LENGTH_SHORT).show();
                                         dismissProgressBar(jsonObject.getString(Configuration.KEY_MESSAGE));
+                                    }
+                                    else{
+                                        dismissProgressBar(jsonObject.getString(Configuration.MESSAGE));
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -235,7 +240,7 @@ public class LoginActivity extends Activity {
     public void openSession(String username,String userID){
         SharedPreferences sharedPreferences = getSharedPreferences(MY_PREFERENCE,MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(Configuration.KEY_PREFERENCE_USER_ID,userID);
+        editor.putString(Configuration.KEY_PURCHASER_ID,userID);
         editor.putString(Configuration.KEY_PREFERENCE_USERNAME,username);
         editor.apply();
         Toast.makeText(getBaseContext(),"Registered Successfully",Toast.LENGTH_LONG).show();

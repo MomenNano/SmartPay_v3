@@ -6,15 +6,15 @@ package com.android.nfc.smartpay_v3.DBA;
 
 public class Configuration {
     //SERVER URLS
-    public static final String REGISTER_URL = "http://d0cebb32.ngrok.io/register/purchaser";
-    public static final String LOGIN_URL = "http://d0cebb32.ngrok.io/login/purchaser";
-    public static final String SEND_PAYMENT_INFO_URL = "http://d0cebb32.ngrok.io/seller/add/purchaser/payment";
-    public static final String PAY_TRANSACTION_URL = "http://d0cebb32.ngrok.io/seller/add/purchaser/payment";
+    public static final String REGISTER_URL = "http://5c1d4c79.ngrok.io/register/purchaser";
+    public static final String LOGIN_URL = "http://5c1d4c79.ngrok.io/login/purchaser";
+    public static final String SEND_PAYMENT_INFO_URL = "http://5c1d4c79.ngrok.io/seller/add/purchaser/payment";
+    public static final String PAY_TRANSACTION_URL = "http://5c1d4c79.ngrok.io/seller/add/purchaser/payment";
     public static final String PAYMENT_HISTORY_URL = "";
-    public static final String DEDUCT_MONEY_URL = "http://d0cebb32.ngrok.io/deduct";
-    public static final String ADD_NEW_CARD_URL = "http://d0cebb32.ngrok.io/addCard";
+    public static final String DEDUCT_MONEY_URL = "http://5c1d4c79.ngrok.io/deduct";
+    public static final String ADD_NEW_CARD_URL = "http://5c1d4c79.ngrok.io/addCard";
     public static final String  GET_STORES_URL = "";
-    public static final String CHECK_PAYMENT_INFO_URL = "http://d0cebb32.ngrok.io/seller/add/purchaser/payment/check";
+    public static final String CHECK_PAYMENT_INFO_URL = "http://5c1d4c79.ngrok.io/seller/add/purchaser/payment/check";
 
 
 

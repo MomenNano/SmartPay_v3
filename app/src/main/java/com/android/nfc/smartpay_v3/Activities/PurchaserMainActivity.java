@@ -47,6 +47,7 @@ public class PurchaserMainActivity extends Activity implements NfcAdapter.Create
     AlertDialog progressbaralert;
     AlertDialog noBalanceAlert;
     AlertDialog paymentSuccessAlert;
+    AlertDialog paymentInfoAlert;
     AlertDialog passwordAlert;
     LayoutInflater inflater;
     View alertView;
@@ -68,6 +69,7 @@ public class PurchaserMainActivity extends Activity implements NfcAdapter.Create
         setContentView(R.layout.activity_purchaser_main);
         progressbaralert = new AlertDialog.Builder(this).create();
         paymentSuccessAlert = new AlertDialog.Builder(this).create();
+        paymentInfoAlert = new AlertDialog.Builder(this).create();
         noBalanceAlert = new AlertDialog.Builder(this).create();
         passwordAlert = new AlertDialog.Builder(this).create();
         alertView = View.inflate(this,R.layout.progress_dialog,null);
@@ -77,6 +79,7 @@ public class PurchaserMainActivity extends Activity implements NfcAdapter.Create
         inflater = getLayoutInflater();
         progressbaralert.setView(alertView);
         paymentSuccessAlert.setView(paymentSuccess);
+        paymentInfoAlert.setView(paymentSuccess);
         noBalanceAlert.setView(noBalanceView);
         passwordAlert.setView(passwordView);
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -153,7 +156,6 @@ public class PurchaserMainActivity extends Activity implements NfcAdapter.Create
         //showPaymentInfo();
         NdefRecord record = messages.getRecords()[0];
         String payload = new String(record.getPayload());
-        PurchaserMessage.setText(payload);
         allGood = true;
         Gson gson = new Gson();
         SharedPreferences sharedPreferences = getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
@@ -299,9 +301,19 @@ public class PurchaserMainActivity extends Activity implements NfcAdapter.Create
         TextView textView = paymentSuccess.findViewById(R.id.success_tv);
         textView.setVisibility(View.VISIBLE);
         TextView message = paymentSuccess.findViewById(R.id.sucess_message);
-        message.setText("Your Transaction was Successfull");
+        TextView date = paymentSuccess.findViewById(R.id.date);
+        TextView time = paymentSuccess.findViewById(R.id.time);
+        TextView billAmount = paymentSuccess.findViewById(R.id.bill_amount);
+        TextView sellerName = paymentSuccess.findViewById(R.id.seller_name);
+        ImageView selelrIcon = paymentSuccess.findViewById(R.id.seller_icon);
+        date.setText(paymentInfo.getStringDate());
+        time.setText(paymentInfo.getStringTime());
+        billAmount.setText(paymentInfo.getBillAmount()+" SDG");
+        sellerName.setText(paymentInfo.getCompanyName());
+        selelrIcon.setImageResource(companiesIcon[paymentInfo.getCompanyType()]);
+        message.setText("Your Payment Transaction Was SuccessFull");
         paymentSuccessAlert.show();
-        paymentSuccessAlert.setCancelable(true);
+
         paymentSuccessAlert.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
@@ -327,12 +339,12 @@ public class PurchaserMainActivity extends Activity implements NfcAdapter.Create
         selelrIcon.setImageResource(companiesIcon[paymentInfo.getCompanyType()]);
         message.setText("Your Payment Information");
         textView.setVisibility(View.GONE);
-        paymentSuccessAlert.show();
-        paymentSuccessAlert.setCancelable(true);
-        paymentSuccessAlert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+        paymentInfoAlert.show();
+        paymentInfoAlert.setCancelable(true);
+        paymentInfoAlert.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
-                paymentSuccessAlert.dismiss();
+                paymentInfoAlert.dismiss();
                 if (LocalDBA.getInstance(getApplicationContext()).getAllCards().get(pos).getCardBalance() < Double.valueOf(paymentInfo.getBillAmount())) {
                     balanceCheck = false;
                     showNoBalanceAlert();
@@ -361,10 +373,11 @@ public class PurchaserMainActivity extends Activity implements NfcAdapter.Create
                 passwordAlert.show();
                 passwordAlert.setCancelable(true);
                 Button btn = passwordView.findViewById(R.id.confirmpasswordBtn);
+                final SharedPreferences sharedPreferences = getSharedPreferences(Configuration.MY_PREFERENCE,MODE_PRIVATE);
                 btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        passwordCheck = password.getText().toString().compareToIgnoreCase(LocalDBA.getInstance(getApplicationContext()).getAllCards().get(pos).getPassword()) == 0;
+                        passwordCheck = password.getText().toString().compareToIgnoreCase(sharedPreferences.getString(Configuration.KEY_PASSWORD,null)) == 0;
                         if (passwordCheck){
                             passwordAlert.dismiss();
                             if (allGood && passwordCheck && balanceCheck) {

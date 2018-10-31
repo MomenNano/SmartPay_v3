@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.nfc.smartpay_v3.Classes.Account;
+import com.android.nfc.smartpay_v3.Classes.Card;
 import com.android.nfc.smartpay_v3.DBA.Configuration;
 import com.android.nfc.smartpay_v3.DBA.DBA;
 import com.android.nfc.smartpay_v3.DBA.LocalDBA;
@@ -40,6 +41,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.JsonObject;
 import com.android.nfc.smartpay_v3.DBA.MySingleton;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -132,12 +134,39 @@ public class LoginActivity extends Activity {
                                 editor.putString(Configuration.KEY_PREFERENCE_USERNAME,l_username.getText().toString());
                                 editor.putString(Configuration.KEY_PURCHASER_ID,id);
                                 editor.putString(Configuration.KEY_PHONE_SERIAL_NO,Build.SERIAL);
+                                editor.putString(Configuration.KEY_PASSWORD,l_password.getText().toString());
                                 editor.apply();
-                                Toast.makeText(getBaseContext(),"Login Successfully",Toast.LENGTH_LONG).show();
-                                dismiss();
-                                Intent intent = new Intent(getBaseContext(),MainActivity.class);
-                                startActivity(intent);
+                                if (LocalDBA.getInstance(getApplicationContext()).getAllCards().isEmpty() && jsonObject.getString("haveCard").compareToIgnoreCase("1")==0) {
+                                    JSONArray cards = jsonObject.getJSONArray("cards");
+                                    for (int i = 0; i < cards.length(); i++) {
+                                        Card card = new Card();
+                                        card.setCardNo(cards.getJSONObject(i).getString("c_number"));
+                                        card.setCardBalance(Double.valueOf(cards.getJSONObject(i).getString("c_deducted_balance")));
+                                        card.setCardHolderName(cards.getJSONObject(i).getString("c_holder_name"));
+                                        if (cards.getJSONObject(i).getString("c_bank_name").compareToIgnoreCase("faisal_bankdb") == 0) {
+                                            card.setBankName("Fisal Islamic Bank");
+                                            card.setCardIcon(0);
+                                        } else if (cards.getJSONObject(i).getString("c_bank_name").compareToIgnoreCase("omdurman_bankdb") == 0) {
+                                            card.setBankName("Omdurman National Bank");
+                                            card.setCardIcon(1);
+                                        } else if (cards.getJSONObject(i).getString("c_bank_name").compareToIgnoreCase("khartoum_bankdb") == 0) {
+                                            card.setBankName("Khartoum National Bank");
+                                            card.setCardIcon(2);
+                                        }
+                                        LocalDBA.getInstance(getApplicationContext()).insertCard(card);
+                                    }
+                                    dismiss();
+                                    Intent intent = new Intent(getBaseContext(),MainActivity.class);
+                                    startActivity(intent);
+                                    Toast.makeText(getBaseContext(),"Login Successfully",Toast.LENGTH_LONG).show();
                                 }
+                                else {
+                                    dismiss();
+                                    Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                                    startActivity(intent);
+                                    Toast.makeText(getBaseContext(), "Login Successfully", Toast.LENGTH_LONG).show();
+                                }
+                            }
                             else{
                                 Toast.makeText(getBaseContext(),"Wrong username or password",Toast.LENGTH_LONG).show();
                                 dismissProgressBar("Wrong username or password");
@@ -169,7 +198,12 @@ public class LoginActivity extends Activity {
                 return params;
             }
         };
-
+         jsonObjectRequest.setRetryPolicy(
+                 new DefaultRetryPolicy(
+                         DefaultRetryPolicy.DEFAULT_TIMEOUT_MS*20,
+                         0,
+                         DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+         );
         requestQueue.add(jsonObjectRequest);
         showProgressBar("Logging...");
 

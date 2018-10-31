@@ -230,7 +230,6 @@ public class LocalDBA extends SQLiteOpenHelper  {
         contentValues.put("c_bank",card.getBankName());
         contentValues.put("c_holder_name",card.getCardHolderName());
         contentValues.put("c_balance",card.getCardBalance());
-        contentValues.put("c_password",card.getPassword());
         contentValues.put("c_icon",card.getCardIcon());
         contentValues.put("c_flag",card.getCardFlag());
         db.insert("Cards",null,contentValues);
